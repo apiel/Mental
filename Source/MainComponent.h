@@ -15,7 +15,12 @@ public:
         setSize(1200, 800);
         loadPlugin();
     }
-    // ~MainComponent() override;
+    
+    ~MainComponent() override
+    {
+        pluginEditor.reset();    // Destroy the editor first
+        plugin_instance.reset(); // Then destroy the plugin instance
+    }
 
     void paint(juce::Graphics &g) override
     {
@@ -31,14 +36,15 @@ public:
 
     juce::AudioPluginFormatManager pluginmanager;
     std::unique_ptr<juce::AudioPluginInstance> plugin_instance;
+    std::unique_ptr<juce::AudioProcessorEditor> pluginEditor;
     void loadPlugin()
     {
         pluginmanager.addDefaultFormats();
-        // the single .vst3 file may have multiple plugin types, so we need to deal with an array
-        // of PluginDescriptions
+
         juce::OwnedArray<juce::PluginDescription> descs;
         juce::VST3PluginFormat v3format;
         v3format.findAllTypesForFile(descs, "/usr/lib/vst3/Vital.vst3");
+
         if (descs.size() > 0)
         {
             juce::String error;
@@ -50,15 +56,18 @@ public:
             else
             {
                 std::cout << "created " << descs[0]->descriptiveName << "\n";
+
                 if (plugin_instance->hasEditor())
                 {
-                    auto *editor = plugin_instance->createEditor();
-                    if (editor)
+                    pluginEditor.reset(plugin_instance->createEditor()); // Assign to unique_ptr
+                    if (pluginEditor)
                     {
-                        addAndMakeVisible(editor);
-                        editor->setBounds(100, 100, editor->getWidth(), editor->getHeight()); // Set to desired position
+                        addAndMakeVisible(pluginEditor.get());                                                  // Add safely
+                        pluginEditor->setBounds(100, 100, pluginEditor->getWidth(), pluginEditor->getHeight()); // Set position
                     }
-                } else {
+                }
+                else
+                {
                     std::cout << "no editor\n";
                 }
             }
