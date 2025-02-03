@@ -34,13 +34,12 @@ public:
 
     // void resized() override;
 
+    int samplesPerBlockExpected = 0;
+    double sampleRate = 0.0;
     void prepareToPlay(int samplesPerBlockExpected, double sampleRate) override
     {
-        if (plugin_instance)
-        {
-            plugin_instance->setRateAndBufferSizeDetails(sampleRate, samplesPerBlockExpected);
-            plugin_instance->prepareToPlay(sampleRate, samplesPerBlockExpected);
-        }
+        this->samplesPerBlockExpected = samplesPerBlockExpected;
+        this->sampleRate = sampleRate;
     }
 
     void releaseResources() override
@@ -72,7 +71,7 @@ public:
         if (descs.size() > 0)
         {
             juce::String error;
-            plugin_instance = pluginmanager.createPluginInstance(*descs[0], 44100, 512, error);
+            plugin_instance = pluginmanager.createPluginInstance(*descs[0], sampleRate, samplesPerBlockExpected, error);
             if (!plugin_instance)
             {
                 std::cout << error << "\n";
@@ -80,13 +79,14 @@ public:
             else
             {
                 std::cout << "created " << descs[0]->descriptiveName << "\n";
+                plugin_instance->prepareToPlay(sampleRate, samplesPerBlockExpected);
 
                 if (plugin_instance->hasEditor())
                 {
                     pluginEditor.reset(plugin_instance->createEditor()); // Assign to unique_ptr
                     if (pluginEditor)
                     {
-                        addAndMakeVisible(pluginEditor.get());                                                  // Add safely
+                        addAndMakeVisible(pluginEditor.get());                                                // Add safely
                         pluginEditor->setBounds(30, 10, pluginEditor->getWidth(), pluginEditor->getHeight()); // Set position
                     }
                 }
