@@ -12,7 +12,6 @@ public:
     {
         setSize(1200, 800);
         setAudioChannels(0, 2);
-        loadPlugin();
     }
 
     ~MainComponent() override
@@ -40,6 +39,7 @@ public:
     {
         this->samplesPerBlockExpected = samplesPerBlockExpected;
         this->sampleRate = sampleRate;
+        loadPlugin();
     }
 
     void releaseResources() override
