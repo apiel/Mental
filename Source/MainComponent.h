@@ -87,7 +87,7 @@ public:
                     if (pluginEditor)
                     {
                         addAndMakeVisible(pluginEditor.get());                                                  // Add safely
-                        pluginEditor->setBounds(100, 100, pluginEditor->getWidth(), pluginEditor->getHeight()); // Set position
+                        pluginEditor->setBounds(30, 10, pluginEditor->getWidth(), pluginEditor->getHeight()); // Set position
                     }
                 }
                 else
