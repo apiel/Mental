@@ -1,5 +1,8 @@
 #pragma once
 
+// VsCode doesn't seems to recognize JUCE_PLUGINHOST_VST3, so I just define it myself.
+#define JUCE_PLUGINHOST_VST3 1
+
 #include <JuceHeader.h>
 
 // https://forum.juce.com/t/juce-plugin-host/61888
@@ -9,7 +12,7 @@ class MainComponent : public juce::Component
 public:
     MainComponent()
     {
-        setSize(600, 400);
+        setSize(1200, 800);
         loadPlugin();
     }
     // ~MainComponent() override;
@@ -47,8 +50,21 @@ public:
             else
             {
                 std::cout << "created " << descs[0]->descriptiveName << "\n";
+                if (plugin_instance->hasEditor())
+                {
+                    auto *editor = plugin_instance->createEditor();
+                    if (editor)
+                    {
+                        addAndMakeVisible(editor);
+                        editor->setBounds(100, 100, editor->getWidth(), editor->getHeight()); // Set to desired position
+                    }
+                } else {
+                    std::cout << "no editor\n";
+                }
             }
-        } else {
+        }
+        else
+        {
             std::cout << "no plugins found\n";
         }
     }
