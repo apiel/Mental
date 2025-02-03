@@ -7,3 +7,6 @@ projucer:
 
 push:
 	git add . && git commit -m "$(m)" && git push
+
+clean:
+	make -C Builds/LinuxMakefile clean

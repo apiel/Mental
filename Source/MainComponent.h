@@ -5,21 +5,21 @@
 
 #include <JuceHeader.h>
 
-// https://forum.juce.com/t/juce-plugin-host/61888
-
-class MainComponent : public juce::Component
+class MainComponent : public juce::AudioAppComponent
 {
 public:
     MainComponent()
     {
         setSize(1200, 800);
+        setAudioChannels(0, 2);
         loadPlugin();
     }
-    
+
     ~MainComponent() override
     {
         pluginEditor.reset();    // Destroy the editor first
         plugin_instance.reset(); // Then destroy the plugin instance
+        shutdownAudio();
     }
 
     void paint(juce::Graphics &g) override
@@ -33,6 +33,30 @@ public:
     }
 
     // void resized() override;
+
+    void prepareToPlay(int samplesPerBlockExpected, double sampleRate) override
+    {
+        if (plugin_instance)
+        {
+            plugin_instance->setRateAndBufferSizeDetails(sampleRate, samplesPerBlockExpected);
+            plugin_instance->prepareToPlay(sampleRate, samplesPerBlockExpected);
+        }
+    }
+
+    void releaseResources() override
+    {
+        if (plugin_instance)
+            plugin_instance->releaseResources();
+    }
+
+    void getNextAudioBlock(const juce::AudioSourceChannelInfo &bufferToFill) override
+    {
+        if (plugin_instance)
+        {
+            juce::MidiBuffer midi; // Empty MIDI buffer (for now)
+            plugin_instance->processBlock(*bufferToFill.buffer, midi);
+        }
+    }
 
     juce::AudioPluginFormatManager pluginmanager;
     std::unique_ptr<juce::AudioPluginInstance> plugin_instance;
