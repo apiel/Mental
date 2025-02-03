@@ -16,8 +16,23 @@ public:
 
     ~MainComponent() override
     {
-        pluginEditor.reset();    // Destroy the editor first
-        plugin_instance.reset(); // Then destroy the plugin instance
+        if (pluginEditor)
+        {
+            removeChildComponent(pluginEditor.get()); // Ensure it's removed before deletion
+            pluginEditor.reset();
+            pluginEditor = nullptr;
+        }
+
+        if (plugin_instance)
+        {
+            // plugin_instance->releaseResources();
+            // plugin_instance.reset();
+            plugin_instance->suspendProcessing(true);
+            plugin_instance->releaseResources();
+            plugin_instance.reset();
+            plugin_instance = nullptr;
+        }
+
         shutdownAudio();
     }
 
@@ -45,15 +60,21 @@ public:
     void releaseResources() override
     {
         if (plugin_instance)
+        {
             plugin_instance->releaseResources();
+        }
     }
 
     void getNextAudioBlock(const juce::AudioSourceChannelInfo &bufferToFill) override
     {
         if (plugin_instance)
         {
-            juce::MidiBuffer midi; // Empty MIDI buffer (for now)
+            juce::MidiBuffer midi; // Empty MIDI buffer
             plugin_instance->processBlock(*bufferToFill.buffer, midi);
+        }
+        else
+        {
+            bufferToFill.clearActiveBufferRegion();
         }
     }
 
