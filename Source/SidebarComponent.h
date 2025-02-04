@@ -2,32 +2,52 @@
 
 #include <JuceHeader.h>
 
+class FlatButtonLookAndFeel : public juce::LookAndFeel_V4 {
+public:
+    void drawButtonBackground(juce::Graphics& g, juce::Button& button,
+        const juce::Colour& backgroundColour,
+        bool isMouseOverButton, bool isButtonDown) override
+    {
+        auto bounds = button.getLocalBounds();
+        // g.setColour(juce::Colours::darkgrey);
+
+        if (isMouseOverButton)
+            g.setColour(juce::Colours::black.withAlpha(0.2f));
+        else
+            g.setColour(juce::Colours::black.withAlpha(0.5f));
+
+        g.fillRect(bounds);
+    }
+};
+
 class SidebarComponent : public juce::Component {
 protected:
     juce::TextButton masterButton, track1Button, track2Button;
     ContainerComponent& container;
+    FlatButtonLookAndFeel flatButtonLookAndFeel;
 
 public:
-    SidebarComponent(ContainerComponent& containerRef) : container(containerRef)
+    SidebarComponent(ContainerComponent& containerRef)
+        : container(containerRef)
     {
-        addAndMakeVisible(masterButton);
-        addAndMakeVisible(track1Button);
-        addAndMakeVisible(track2Button);
+        addTabButton(masterButton, 0);
+        addTabButton(track1Button, 1);
+        addTabButton(track2Button, 2);
+    }
 
-        masterButton.setButtonText(containerRef.getTabNames()[0]);
-        track1Button.setButtonText(containerRef.getTabNames()[1]);
-        track2Button.setButtonText(containerRef.getTabNames()[2]);
-
-        masterButton.onClick = [this] { container.setCurrentTabIndex(0); };
-        track1Button.onClick = [this] { container.setCurrentTabIndex(1); };
-        track2Button.onClick = [this] { container.setCurrentTabIndex(2); };
+    void addTabButton(juce::TextButton& button, int index) {
+        addAndMakeVisible(button);
+        button.setButtonText(container.getTabNames()[index]);
+        button.onClick = [this, index] { container.setCurrentTabIndex(index); };
+        button.setLookAndFeel(&flatButtonLookAndFeel);
     }
 
     void resized() override
     {
-        masterButton.setBounds(10, 10, getWidth() - 20, 40);
-        track1Button.setBounds(10, 60, getWidth() - 20, 40);
-        track2Button.setBounds(10, 110, getWidth() - 20, 40);
+        int h = 60;
+        masterButton.setBounds(0, 0, getWidth(), h - 1);
+        track1Button.setBounds(0, h, getWidth(), h - 1);
+        track2Button.setBounds(0, h * 2, getWidth(), h - 1);
     }
 
     void paint(juce::Graphics& g) override

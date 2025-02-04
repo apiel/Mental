@@ -25,7 +25,7 @@ public:
 
     void resized() override
     {
-        int sidebarWidth = 200;
+        int sidebarWidth = 100;
         sidebar.setBounds(0, 0, sidebarWidth, getHeight());
         container.setBounds(sidebarWidth, 0, getWidth() - sidebarWidth, getHeight());
     }

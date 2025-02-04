@@ -2,6 +2,7 @@
 
 // VsCode doesn't seems to recognize JUCE_PLUGINHOST_VST3, so I just define it myself.
 #define JUCE_PLUGINHOST_VST3 1
+// #define JUCE_PLUGINHOST_VST 1
 #define JUCE_PLUGINHOST_LV2 1
 
 #include <JuceHeader.h>
@@ -15,24 +16,25 @@ public:
 
     ~TrackComponent() override
     {
-        if (pluginEditor) {
-            removeChildComponent(pluginEditor.get()); // Ensure it's removed before deletion
-            pluginEditor.reset();
-            pluginEditor = nullptr;
-        }
+        // if (pluginEditor) {
+        //     removeChildComponent(pluginEditor.get()); // Ensure it's removed before deletion
+        //     pluginEditor.reset();
+        //     pluginEditor = nullptr;
+        // }
 
-        if (plugin_instance) {
-            // plugin_instance->releaseResources();
-            // plugin_instance.reset();
-            plugin_instance->suspendProcessing(true);
-            plugin_instance->releaseResources();
-            plugin_instance.reset();
-            plugin_instance = nullptr;
-        }
+        // if (plugin_instance) {
+        //     // plugin_instance->releaseResources();
+        //     // plugin_instance.reset();
+        //     plugin_instance->suspendProcessing(true);
+        //     plugin_instance->releaseResources();
+        //     plugin_instance.reset();
+        //     plugin_instance = nullptr;
+        // }
 
         // pluginEditor = nullptr;
         // plugin_instance = nullptr;
 
+        deleteAllChildren();
         shutdownAudio();
     }
 
@@ -106,6 +108,7 @@ public:
         juce::OwnedArray<juce::PluginDescription> descs;
 
         juce::VST3PluginFormat format;
+        // juce::VSTPluginFormat format;
         format.findAllTypesForFile(descs, "/usr/lib/vst3/Vital.vst3");
 
         if (descs.size() > 0) {
