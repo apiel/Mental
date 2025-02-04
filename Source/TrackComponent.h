@@ -6,8 +6,7 @@
 
 #include <JuceHeader.h>
 
-class TrackComponent : public juce::AudioAppComponent
-{
+class TrackComponent : public juce::AudioAppComponent {
 public:
     TrackComponent()
     {
@@ -16,15 +15,13 @@ public:
 
     ~TrackComponent() override
     {
-        if (pluginEditor)
-        {
+        if (pluginEditor) {
             removeChildComponent(pluginEditor.get()); // Ensure it's removed before deletion
             pluginEditor.reset();
             pluginEditor = nullptr;
         }
 
-        if (plugin_instance)
-        {
+        if (plugin_instance) {
             // plugin_instance->releaseResources();
             // plugin_instance.reset();
             plugin_instance->suspendProcessing(true);
@@ -39,17 +36,12 @@ public:
         shutdownAudio();
     }
 
-    // void paint(juce::Graphics &g) override
-    // {
-    //     // (Our component is opaque, so we must completely fill the background with a solid colour)
-    //     g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
-
-    //     g.setFont(juce::FontOptions(16.0f));
-    //     g.setColour(juce::Colours::white);
-    //     g.drawText("Hello World!", getLocalBounds(), juce::Justification::centred, true);
-    // }
-
-    // void resized() override;
+    void resized() override
+    {
+        if (pluginEditor && pluginEditor->isResizable()) {
+            pluginEditor->setBounds(getLocalBounds());
+        }
+    }
 
     int samplesPerBlockExpected = 0;
     double sampleRate = 0.0;
@@ -62,21 +54,17 @@ public:
 
     void releaseResources() override
     {
-        if (plugin_instance)
-        {
+        if (plugin_instance) {
             plugin_instance->releaseResources();
         }
     }
 
-    void getNextAudioBlock(const juce::AudioSourceChannelInfo &bufferToFill) override
+    void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) override
     {
-        if (plugin_instance)
-        {
+        if (plugin_instance) {
             juce::MidiBuffer midi; // Empty MIDI buffer
             plugin_instance->processBlock(*bufferToFill.buffer, midi);
-        }
-        else
-        {
+        } else {
             bufferToFill.clearActiveBufferRegion();
         }
     }
@@ -93,36 +81,27 @@ public:
         juce::VST3PluginFormat format;
         format.findAllTypesForFile(descs, "/usr/lib/vst3/Vital.vst3");
 
-        if (descs.size() > 0)
-        {
+        if (descs.size() > 0) {
             juce::String error;
             plugin_instance = pluginmanager.createPluginInstance(*descs[0], sampleRate, samplesPerBlockExpected, error);
-            if (!plugin_instance)
-            {
+            if (!plugin_instance) {
                 std::cout << error << "\n";
-            }
-            else
-            {
+            } else {
                 std::cout << "created " << descs[0]->descriptiveName << "\n";
                 plugin_instance->prepareToPlay(sampleRate, samplesPerBlockExpected);
 
-                if (plugin_instance->hasEditor())
-                {
+                if (plugin_instance->hasEditor()) {
                     pluginEditor.reset(plugin_instance->createEditor()); // Assign to unique_ptr
-                    if (pluginEditor)
-                    {
+                    if (pluginEditor) {
                         addAndMakeVisible(pluginEditor.get());
-                        pluginEditor->setBounds(0, 0, getWidth(), getHeight());
+                        // pluginEditor->setBounds(0, 0, pluginEditor->getWidth(), pluginEditor->getHeight());
+                        // pluginEditor->setBounds(getLocalBounds());
                     }
-                }
-                else
-                {
+                } else {
                     std::cout << "no editor\n";
                 }
             }
-        }
-        else
-        {
+        } else {
             std::cout << "no plugins found\n";
         }
     }

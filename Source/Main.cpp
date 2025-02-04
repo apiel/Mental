@@ -1,18 +1,17 @@
-#include <JuceHeader.h>
 #include "MainComponent.h"
+#include <JuceHeader.h>
 
-class MentalApplication  : public juce::JUCEApplication
-{
+class MentalApplication : public juce::JUCEApplication {
 public:
-    MentalApplication() {}
+    MentalApplication() { }
 
-    const juce::String getApplicationName() override       { return ProjectInfo::projectName; }
-    const juce::String getApplicationVersion() override    { return ProjectInfo::versionString; }
-    bool moreThanOneInstanceAllowed() override             { return true; }
+    const juce::String getApplicationName() override { return ProjectInfo::projectName; }
+    const juce::String getApplicationVersion() override { return ProjectInfo::versionString; }
+    bool moreThanOneInstanceAllowed() override { return true; }
 
-    void initialise (const juce::String& commandLine) override
+    void initialise(const juce::String& commandLine) override
     {
-        mainWindow.reset (new MainWindow (getApplicationName()));
+        mainWindow.reset(new MainWindow(getApplicationName()));
     }
 
     void shutdown() override
@@ -25,22 +24,20 @@ public:
         quit();
     }
 
-    class MainWindow    : public juce::DocumentWindow
-    {
+    class MainWindow : public juce::DocumentWindow {
     public:
-        MainWindow (juce::String name)
-            : DocumentWindow (name,
-                              juce::Desktop::getInstance().getDefaultLookAndFeel()
-                                                          .findColour (juce::ResizableWindow::backgroundColourId),
-                              DocumentWindow::allButtons)
+        MainWindow(juce::String name)
+            : DocumentWindow(name,
+                  juce::Desktop::getInstance().getDefaultLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId),
+                  DocumentWindow::allButtons)
         {
-            setUsingNativeTitleBar (true);
-            setContentOwned (new MainComponent(), true);
+            setUsingNativeTitleBar(true);
+            setContentOwned(new MainComponent(), true);
 
-            setFullScreen (true);
-            setResizable (true, true);
-            setVisible (true);
-            centreWithSize (getWidth(), getHeight()); // might change this...
+            setFullScreen(true);
+            setResizable(true, true);
+            setVisible(true);
+            centreWithSize(getWidth(), getHeight()); // might change this...
         }
 
         void closeButtonPressed() override
@@ -48,9 +45,8 @@ public:
             JUCEApplication::getInstance()->systemRequestedQuit();
         }
 
-
     private:
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainWindow)
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainWindow)
     };
 
 private:
@@ -59,4 +55,4 @@ private:
 
 //==============================================================================
 // This macro generates the main() routine that launches the app.
-START_JUCE_APPLICATION (MentalApplication)
+START_JUCE_APPLICATION(MentalApplication)
