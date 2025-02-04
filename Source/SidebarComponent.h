@@ -4,26 +4,30 @@
 
 class SidebarComponent : public juce::Component {
 protected:
-    juce::TextButton track1Button, track2Button;
+    juce::TextButton masterButton, track1Button, track2Button;
     ContainerComponent& container;
 
 public:
     SidebarComponent(ContainerComponent& containerRef) : container(containerRef)
     {
+        addAndMakeVisible(masterButton);
         addAndMakeVisible(track1Button);
         addAndMakeVisible(track2Button);
 
-        track1Button.setButtonText(containerRef.getTabNames()[0]);
-        track2Button.setButtonText(containerRef.getTabNames()[1]);
+        masterButton.setButtonText(containerRef.getTabNames()[0]);
+        track1Button.setButtonText(containerRef.getTabNames()[1]);
+        track2Button.setButtonText(containerRef.getTabNames()[2]);
 
-        track1Button.onClick = [this] { container.setCurrentTabIndex(0); };
-        track2Button.onClick = [this] { container.setCurrentTabIndex(1); };
+        masterButton.onClick = [this] { container.setCurrentTabIndex(0); };
+        track1Button.onClick = [this] { container.setCurrentTabIndex(1); };
+        track2Button.onClick = [this] { container.setCurrentTabIndex(2); };
     }
 
     void resized() override
     {
-        track1Button.setBounds(10, 50, getWidth() - 20, 40);
-        track2Button.setBounds(10, 100, getWidth() - 20, 40);
+        masterButton.setBounds(10, 10, getWidth() - 20, 40);
+        track1Button.setBounds(10, 60, getWidth() - 20, 40);
+        track2Button.setBounds(10, 110, getWidth() - 20, 40);
     }
 
     void paint(juce::Graphics& g) override

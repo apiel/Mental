@@ -59,6 +59,33 @@ public:
         }
     }
 
+    int tabId = -1;
+    void currentTabChanged(int newTabIndex, const juce::String& newTabName)
+    {
+        if (tabId == newTabIndex) {
+            showPluginEditor();
+        } else {
+            hidePluginEditor();
+        }
+    }
+
+    void showPluginEditor()
+    {
+        if (plugin_instance && plugin_instance->hasEditor() && !pluginEditor) {
+            pluginEditor.reset(plugin_instance->createEditor());
+            addAndMakeVisible(pluginEditor.get());
+            pluginEditor->setBounds(getLocalBounds());
+        }
+    }
+
+    void hidePluginEditor()
+    {
+        if (pluginEditor) {
+            removeChildComponent(pluginEditor.get());
+            pluginEditor.reset();
+        }
+    }
+
     void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) override
     {
         if (plugin_instance) {
@@ -90,16 +117,16 @@ public:
                 std::cout << "created " << descs[0]->descriptiveName << "\n";
                 plugin_instance->prepareToPlay(sampleRate, samplesPerBlockExpected);
 
-                if (plugin_instance->hasEditor()) {
-                    pluginEditor.reset(plugin_instance->createEditor()); // Assign to unique_ptr
-                    if (pluginEditor) {
-                        addAndMakeVisible(pluginEditor.get());
-                        // pluginEditor->setBounds(0, 0, pluginEditor->getWidth(), pluginEditor->getHeight());
-                        // pluginEditor->setBounds(getLocalBounds());
-                    }
-                } else {
-                    std::cout << "no editor\n";
-                }
+                // if (plugin_instance->hasEditor()) {
+                //     pluginEditor.reset(plugin_instance->createEditor()); // Assign to unique_ptr
+                //     if (pluginEditor) {
+                //         addAndMakeVisible(pluginEditor.get());
+                //         // pluginEditor->setBounds(0, 0, pluginEditor->getWidth(), pluginEditor->getHeight());
+                //         // pluginEditor->setBounds(getLocalBounds());
+                //     }
+                // } else {
+                //     std::cout << "no editor\n";
+                // }
             }
         } else {
             std::cout << "no plugins found\n";
