@@ -2,7 +2,7 @@ all:
 	make -C Builds/LinuxMakefile
 	./Builds/LinuxMakefile/build/Mental
 
-projucer:
+Projucer:
 	./libs/JUCE/extras/Projucer/Builds/LinuxMakefile/build/Projucer
 
 push:
