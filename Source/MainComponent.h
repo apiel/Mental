@@ -11,14 +11,12 @@
 
 class MainComponent : public juce::Component {
 protected:
-    SidebarComponent sidebar;
     ContainerComponent container;
+    SidebarComponent sidebar;
 
 public:
     MainComponent()
-        : sidebar([this](int trackIndex) {
-            container.setCurrentTabIndex(trackIndex);
-        })
+        : sidebar(container)
     {
         setSize(1200, 800);
         addAndMakeVisible(sidebar);

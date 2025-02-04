@@ -5,20 +5,19 @@
 class SidebarComponent : public juce::Component {
 protected:
     juce::TextButton track1Button, track2Button;
-    std::function<void(int)> setTab;
+    ContainerComponent& container;
 
 public:
-    SidebarComponent(std::function<void(int)> setTabCallback)
-        : setTab(setTabCallback)
+    SidebarComponent(ContainerComponent& containerRef) : container(containerRef)
     {
         addAndMakeVisible(track1Button);
         addAndMakeVisible(track2Button);
 
-        track1Button.setButtonText("Show Track 1");
-        track2Button.setButtonText("Show Track 2");
+        track1Button.setButtonText(containerRef.getTabNames()[0]);
+        track2Button.setButtonText(containerRef.getTabNames()[1]);
 
-        track1Button.onClick = [this] { setTab(0); };
-        track2Button.onClick = [this] { setTab(1); };
+        track1Button.onClick = [this] { container.setCurrentTabIndex(0); };
+        track2Button.onClick = [this] { container.setCurrentTabIndex(1); };
     }
 
     void resized() override
