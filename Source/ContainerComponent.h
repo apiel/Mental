@@ -19,48 +19,10 @@ public:
         setCurrentTabIndex(0); // Start with Track 1
     }
 
-    // ContainerComponent()
-    // {
-    //   addAndMakeVisible(trackComponent1);
-    //   addAndMakeVisible(trackComponent2);
-
-    //   trackComponent1.setVisible(true);
-    //   trackComponent2.setVisible(false);
-
-    //   trackComponent1.toFront(true);
-    // }
-
-    // void showTrack(int trackIndex)
-    // {
-    //   if (trackIndex == 0)
-    //   {
-    //     printf("Showing track 1\n");
-    //     trackComponent1.setVisible(true);
-    //     trackComponent2.setVisible(false);
-    //     trackComponent1.toFront(true);
-    //   }
-    //   else
-    //   {
-    //     printf("Showing track 2\n");
-    //     trackComponent1.setVisible(false);
-    //     trackComponent2.setVisible(true);
-    //     trackComponent2.toFront(true);
-    //   }
-    //   // resized();
-    //   repaint();
-    // }
-
     void resized() override
     {
         trackComponent1.setBounds(getLocalBounds());
         trackComponent2.setBounds(getLocalBounds());
     }
 
-    // void paint(juce::Graphics &g) override
-    // {
-    //   // g.fillAll(juce::Colours::darkgrey); // Background color
-    //   g.setColour(juce::Colours::white);
-    //   g.setFont(20.0f);
-    //   g.drawText("Container", getLocalBounds(), juce::Justification::centred);
-    // }
 };
