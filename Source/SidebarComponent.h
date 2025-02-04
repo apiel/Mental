@@ -35,7 +35,15 @@ public:
         addTabButton(track2Button, 2);
     }
 
-    void addTabButton(juce::TextButton& button, int index) {
+    ~SidebarComponent() override
+    {
+        masterButton.setLookAndFeel(nullptr);
+        track1Button.setLookAndFeel(nullptr);
+        track2Button.setLookAndFeel(nullptr);
+    }
+
+    void addTabButton(juce::TextButton& button, int index)
+    {
         addAndMakeVisible(button);
         button.setButtonText(container.getTabNames()[index]);
         button.onClick = [this, index] { container.setCurrentTabIndex(index); };
