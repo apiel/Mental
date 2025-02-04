@@ -48,6 +48,7 @@ public:
         button.setButtonText(container.getTabNames()[index]);
         button.onClick = [this, index] { container.setCurrentTabIndex(index); };
         button.setLookAndFeel(&flatButtonLookAndFeel);
+        button.setColour(juce::TextButton::textColourOffId, container.getTabBackgroundColour(index));
     }
 
     void resized() override
