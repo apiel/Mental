@@ -16,7 +16,7 @@ public:
 
         auto bounds = button.getLocalBounds();
 
-        juce::FontOptions options(button.getHeight() * 0.3f, juce::Font::bold);
+        juce::FontOptions options(button.getHeight() * 0.2f, juce::Font::bold);
         g.setFont(juce::Font(options));
 
         g.setColour(button.getTabBackgroundColour());
@@ -41,7 +41,7 @@ public:
     ContainerComponent()
         : juce::TabbedComponent(juce::TabbedButtonBar::TabsAtLeft)
     {
-        setTabBarDepth(70);
+        setTabBarDepth(80);
         setColour(TabbedComponent::backgroundColourId, containerTabbarColour);
         setLookAndFeel(&tabLookAndFeel);
 

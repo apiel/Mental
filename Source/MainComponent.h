@@ -12,22 +12,17 @@
 class MainComponent : public juce::Component {
 protected:
     ContainerComponent container;
-    SidebarComponent sidebar;
 
 public:
     MainComponent()
-        : sidebar(container)
     {
         setSize(1200, 800);
-        addAndMakeVisible(sidebar);
         addAndMakeVisible(container);
     }
 
     void resized() override
     {
-        int sidebarWidth = 100;
-        sidebar.setBounds(0, 0, sidebarWidth, getHeight());
-        container.setBounds(sidebarWidth, 0, getWidth() - sidebarWidth, getHeight());
+        container.setBounds(0, 0, getWidth(), getHeight());
     }
 
     void paint(juce::Graphics& g) override
