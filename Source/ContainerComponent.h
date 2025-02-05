@@ -15,11 +15,11 @@ public:
     ContainerComponent()
         : juce::TabbedComponent(juce::TabbedButtonBar::TabsAtTop)
     {
-        addTab("Master", juce::Colours::lightgrey, &masterComponent, false);
+        addTab("Master", juce::Colours::grey, &masterComponent, false);
         masterComponent.tabId = 0;
-        addTab("Track 1", juce::Colours::lightblue, &trackComponent1, false);
+        addTab("Track 1", juce::Colours::orange, &trackComponent1, false);
         trackComponent1.tabId = 1;
-        addTab("Track 2", juce::Colours::lightgreen, &trackComponent2, false);
+        addTab("Track 2", juce::Colours::green, &trackComponent2, false);
         trackComponent2.tabId = 2;
 
         setCurrentTabIndex(0); // Start with Track 1

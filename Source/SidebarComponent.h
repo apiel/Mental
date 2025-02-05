@@ -18,6 +18,12 @@ public:
 
         g.fillRect(bounds);
     }
+
+    juce::Font getTextButtonFont(juce::TextButton& button, int buttonHeight) override
+    {
+        juce::FontOptions options(buttonHeight * 0.3f, juce::Font::bold);
+        return juce::Font(options);
+    }
 };
 
 class SidebarComponent : public juce::Component {
