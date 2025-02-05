@@ -2,6 +2,8 @@
 
 #include <JuceHeader.h>
 
+juce::Colour sidebarColour = juce::Colours::black.brighter(0.1);
+
 class FlatButtonLookAndFeel : public juce::LookAndFeel_V4 {
 public:
     void drawButtonBackground(juce::Graphics& g, juce::Button& button,
@@ -12,9 +14,9 @@ public:
         // g.setColour(juce::Colours::darkgrey);
 
         if (isMouseOverButton)
-            g.setColour(juce::Colours::black.withAlpha(0.2f));
+            g.setColour(sidebarColour);
         else
-            g.setColour(juce::Colours::black.withAlpha(0.5f));
+            g.setColour(sidebarColour.brighter(0.03f));
 
         g.fillRect(bounds);
     }
@@ -60,13 +62,13 @@ public:
     void resized() override
     {
         int h = 60;
-        masterButton.setBounds(0, 0, getWidth(), h - 1);
-        track1Button.setBounds(0, h, getWidth(), h - 1);
-        track2Button.setBounds(0, h * 2, getWidth(), h - 1);
+        masterButton.setBounds(0, 0, getWidth(), h - 2);
+        track1Button.setBounds(0, h, getWidth(), h - 2);
+        track2Button.setBounds(0, h * 2, getWidth(), h - 2);
     }
 
     void paint(juce::Graphics& g) override
     {
-        g.fillAll(juce::Colours::darkgrey);
+        g.fillAll(sidebarColour);
     }
 };

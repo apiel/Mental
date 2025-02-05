@@ -19,7 +19,7 @@ public:
     }
 
     int tabId = -1;
-    void currentTabChanged(int newTabIndex, const juce::String& newTabName)
+    void parentTabChanged(int newTabIndex, const juce::String& newTabName)
     {
     }
 };
