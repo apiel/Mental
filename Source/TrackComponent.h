@@ -17,9 +17,14 @@ public:
 
         setCurrentTabIndex(0);
     }
+    // void resized() override
+    // {
+    //     audioComponent.setBounds(getLocalBounds());
+    // }
+
     void resized() override
     {
-        audioComponent.setBounds(getLocalBounds());
+        TabbedComponent::resized();
     }
 
     int tabId = -1;

@@ -12,18 +12,28 @@
 class MainComponent : public juce::Component {
 protected:
     ContainerComponent container;
+    SidebarComponent sidebar;
 
 public:
     MainComponent()
+        : sidebar(container)
     {
         setSize(1200, 800);
+        addAndMakeVisible(sidebar);
         addAndMakeVisible(container);
     }
 
     void resized() override
     {
-        container.setBounds(0, 0, getWidth(), getHeight());
+        int sidebarWidth = 100;
+        sidebar.setBounds(0, 0, sidebarWidth, getHeight());
+        container.setBounds(sidebarWidth, 0, getWidth() - sidebarWidth, getHeight());
     }
+
+    // void paint(juce::Graphics& g) override
+    // {
+    //     g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
+    // }
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
