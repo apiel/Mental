@@ -45,3 +45,33 @@ public:
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TrackComponent)
 };
+
+// Instead of custom sidebar...:
+
+// juce::Colour containerTabBarColour = juce::Colours::black.brighter(0.1);
+
+// class SideTabLookAndFeel : public juce::LookAndFeel_V4 {
+// protected:
+// public:
+//     void drawTabButton(juce::TabBarButton& button, juce::Graphics& g, bool isMouseOver, bool isMouseDown) override
+//     {
+//         // g.fillAll(isMouseOver ? containerTabBarColour : containerTabBarColour.brighter(0.03f));
+
+//         auto bounds = button.getLocalBounds();
+
+//         g.setColour(isMouseOver ? containerTabBarColour : containerTabBarColour.brighter(0.03f));
+//         bounds.setWidth(bounds.getWidth() - 1);
+//         g.fillRect(bounds);
+
+//         juce::FontOptions options(button.getHeight() * 0.2f, juce::Font::bold);
+//         g.setFont(juce::Font(options));
+
+//         g.setColour(button.getTabBackgroundColour());
+//         g.drawFittedText(button.getButtonText(), bounds, juce::Justification::centred, 1);
+//     }
+
+//     int getTabButtonBestWidth(juce::TabBarButton&, int tabDepth) override
+//     {
+//         return tabDepth;
+//     }
+// };
