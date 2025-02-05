@@ -25,11 +25,6 @@ public:
         container.setBounds(0, 0, getWidth(), getHeight());
     }
 
-    void paint(juce::Graphics& g) override
-    {
-        g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
-    }
-
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };

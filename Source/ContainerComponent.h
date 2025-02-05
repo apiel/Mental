@@ -5,16 +5,20 @@
 #include "MasterComponent.h"
 #include "TrackComponent.h"
 
-juce::Colour containerTabbarColour = juce::Colours::black.brighter(0.1);
+juce::Colour containerTabBarColour = juce::Colours::black.brighter(0.1);
 
 class SideTabLookAndFeel : public juce::LookAndFeel_V4 {
 protected:
 public:
     void drawTabButton(juce::TabBarButton& button, juce::Graphics& g, bool isMouseOver, bool isMouseDown) override
     {
-        g.fillAll(isMouseOver ? containerTabbarColour : containerTabbarColour.brighter(0.03f));
+        // g.fillAll(isMouseOver ? containerTabBarColour : containerTabBarColour.brighter(0.03f));
 
         auto bounds = button.getLocalBounds();
+
+        g.setColour(isMouseOver ? containerTabBarColour : containerTabBarColour.brighter(0.03f));
+        bounds.setWidth(bounds.getWidth() - 1);
+        g.fillRect(bounds);
 
         juce::FontOptions options(button.getHeight() * 0.2f, juce::Font::bold);
         g.setFont(juce::Font(options));
@@ -42,7 +46,8 @@ public:
         : juce::TabbedComponent(juce::TabbedButtonBar::TabsAtLeft)
     {
         setTabBarDepth(80);
-        setColour(TabbedComponent::backgroundColourId, containerTabbarColour);
+        setColour(TabbedComponent::backgroundColourId, containerTabBarColour);
+        // setColour(TabbedComponent::outlineColourId, containerTabBarColour);
         setLookAndFeel(&tabLookAndFeel);
 
         addTab("Master", juce::Colours::grey, &masterComponent, false);
@@ -59,6 +64,11 @@ public:
     {
         setLookAndFeel(nullptr);
     }
+
+    // void paint(juce::Graphics& g) override
+    // {
+    //     // g.fillAll(containerTabBarColour);
+    // }
 
     void resized() override
     {
