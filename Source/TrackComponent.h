@@ -2,23 +2,48 @@
 
 #include <JuceHeader.h>
 
-#include "constants.h"
 #include "TrackAudioComponent.h"
+#include "constants.h"
+
+class TrackTabLookAndFeel : public juce::LookAndFeel_V4 {
+public:
+    void drawTabButton(juce::TabBarButton& button, juce::Graphics& g, bool isMouseOver, bool isMouseDown) override
+    {
+        g.fillAll(isMouseOver ? sidebarColour : sidebarColour.brighter(0.05f));
+
+        auto bounds = button.getLocalBounds();
+
+        // g.setColour(isMouseOver ? sidebarColour : sidebarColour.brighter(0.03f));
+        // bounds.setWidth(bounds.getWidth() - 1);
+        // g.fillRect(bounds);
+
+        juce::FontOptions options(button.getHeight() * 0.5f, juce::Font::bold);
+        g.setFont(juce::Font(options));
+
+        g.setColour(button.getTabBackgroundColour());
+        g.drawFittedText(button.getButtonText(), bounds, juce::Justification::centred, 1);
+    }
+};
 
 class TrackComponent : public juce::TabbedComponent {
 protected:
+    TrackTabLookAndFeel tabLookAndFeel;
+
     TrackAudioComponent audioComponent;
 
 public:
-    TrackComponent()
+    juce::Colour color;
+    TrackComponent(juce::Colour color)
         : juce::TabbedComponent(juce::TabbedButtonBar::TabsAtTop)
+        , color(color)
     {
         setColour(TabbedComponent::backgroundColourId, sidebarColour);
         // setColour(TabbedComponent::outlineColourId, sidebarColour);
         setOutline(0);
+        setLookAndFeel(&tabLookAndFeel);
 
         // addTab("Audio", juce::Colours::grey, &audioComponent, false);
-        addTab("Audio", juce::Colours::blue, &audioComponent, false);
+        addTab("Synth engine", color, &audioComponent, false);
         audioComponent.tabId = 0;
 
         setCurrentTabIndex(0);

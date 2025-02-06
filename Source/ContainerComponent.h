@@ -2,8 +2,8 @@
 
 #include <JuceHeader.h>
 
-#include "TrackComponent.h"
 #include "MasterComponent.h"
+#include "TrackComponent.h"
 // #include "constants.h"
 
 class ContainerComponent : public juce::TabbedComponent {
@@ -15,6 +15,8 @@ protected:
 public:
     ContainerComponent()
         : juce::TabbedComponent(juce::TabbedButtonBar::TabsAtLeft)
+        , trackComponent1(juce::Colours::orange)
+        , trackComponent2(juce::Colours::green)
     {
         // setColour(TabbedComponent::backgroundColourId, sidebarColour);
         // setColour(TabbedComponent::outlineColourId, sidebarColour);
@@ -22,9 +24,9 @@ public:
 
         addTab("Master", juce::Colours::grey, &masterComponent, false);
         masterComponent.tabId = 0;
-        addTab("Track 1", juce::Colours::orange, &trackComponent1, false);
+        addTab("Track 1", trackComponent1.color, &trackComponent1, false);
         trackComponent1.tabId = 1;
-        addTab("Track 2", juce::Colours::green, &trackComponent2, false);
+        addTab("Track 2", trackComponent2.color, &trackComponent2, false);
         trackComponent2.tabId = 2;
 
         setCurrentTabIndex(0); // Start with Track 1
