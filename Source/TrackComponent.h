@@ -3,6 +3,7 @@
 #include <JuceHeader.h>
 
 #include "TrackAudioComponent.h"
+#include "TrackSeqComponent.h"
 #include "constants.h"
 
 class TrackTabLookAndFeel : public juce::LookAndFeel_V4 {
@@ -17,10 +18,10 @@ public:
         // bounds.setWidth(bounds.getWidth() - 1);
         // g.fillRect(bounds);
 
-        juce::FontOptions options(button.getHeight() * 0.5f, juce::Font::bold);
+        juce::FontOptions options(button.getHeight() * 0.4f, juce::Font::bold);
         g.setFont(juce::Font(options));
 
-        g.setColour(button.getTabBackgroundColour());
+        g.setColour(button.isFrontTab() ? button.getTabBackgroundColour() : button.getTabBackgroundColour().darker(0.5f));
         g.drawFittedText(button.getButtonText(), bounds, juce::Justification::centred, 1);
     }
 };
@@ -30,6 +31,7 @@ protected:
     TrackTabLookAndFeel tabLookAndFeel;
 
     TrackAudioComponent audioComponent;
+    TrackSeqComponent seqComponent;
 
 public:
     juce::Colour color;
@@ -41,13 +43,21 @@ public:
         // setColour(TabbedComponent::outlineColourId, sidebarColour);
         setOutline(0);
         setLookAndFeel(&tabLookAndFeel);
+        setTabBarDepth(40);
 
-        // addTab("Audio", juce::Colours::grey, &audioComponent, false);
+        addTab("Sequencer", color, &seqComponent, false);
+        seqComponent.tabId = 0;
         addTab("Synth engine", color, &audioComponent, false);
-        audioComponent.tabId = 0;
+        audioComponent.tabId = 1;
 
         setCurrentTabIndex(0);
     }
+
+    ~TrackComponent() override
+    {
+        setLookAndFeel(nullptr);
+    }
+
     // void resized() override
     // {
     //     audioComponent.setBounds(getLocalBounds());
@@ -70,7 +80,8 @@ public:
 
     void currentTabChanged(int newTabIndex, const juce::String& newTabName) override
     {
-        // audioComponent.currentTabChanged(newTabIndex, newTabName);
+        seqComponent.parentTabChanged(newTabIndex, newTabName);
+        audioComponent.parentTabChanged(newTabIndex, newTabName);
     }
 
 private:
