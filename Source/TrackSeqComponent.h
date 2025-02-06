@@ -17,6 +17,11 @@ protected:
     int numSteps = 64;
     int numNotes = 36; // Now starting from C0 upwards
 
+    int getMidiRangeStart()
+    {
+        return (120 - 24) - verticalScrollbar.getCurrentRangeStart();
+    }
+
 public:
     juce::Colour color;
 
@@ -48,7 +53,7 @@ public:
         int stepWidth = getWidth() / numSteps;
         int noteHeight = (getHeight() - 20) / numNotes; // Leave 20px for header
 
-        int midiRangeStart = (120 - (numNotes/2)) - verticalScrollbar.getCurrentRangeStart();
+        int midiRangeStart = getMidiRangeStart();
 
         // Draw Step Headers
         g.setColour(seqHeaderColour);
@@ -150,12 +155,11 @@ public:
             return;
         }
 
+        int midiRangeStart = getMidiRangeStart();
+        int stepWidth = getWidth() / numSteps;
+        int noteHeight = (getHeight() - 20) / numNotes;
         for (auto& note : midiNotes) {
-            int stepWidth = getWidth() / numSteps;
-            int noteHeight = (getHeight() - 20) / numNotes;
-            int midiRangeStart = verticalScrollbar.getCurrentRangeStart();
             int y = 20 + (numNotes - (note.pitch - midiRangeStart) - 1) * noteHeight;
-
             // If mouse is over a note, change length instead of scrolling
             if (event.y >= y && event.y < y + noteHeight && event.x >= note.startStep * stepWidth && event.x < (note.startStep + note.length) * stepWidth) {
                 int delta = (wheel.deltaY > 0) ? 1 : -1;
