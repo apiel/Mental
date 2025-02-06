@@ -18,7 +18,10 @@ protected:
     int numNotes = 36; // Now starting from C0 upwards
 
 public:
-    TrackSeqComponent()
+    juce::Colour color;
+
+    TrackSeqComponent(juce::Colour color)
+        : color(color)
     {
         // Example MIDI Notes (Step, Pitch, Length)
         midiNotes.add({ 0, 60, 4 }); // C4 spanning 4 steps
@@ -116,10 +119,8 @@ public:
                 int width = note.length * stepWidth;
                 int height = noteHeight;
 
-                g.setColour(juce::Colours::blue);
+                g.setColour(color);
                 g.fillRect(x, y, width, height);
-                g.setColour(juce::Colours::white);
-                g.drawRect(x, y, width, height, 1);
             }
         }
     }

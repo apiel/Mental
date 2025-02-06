@@ -38,6 +38,7 @@ public:
     TrackComponent(juce::Colour color)
         : juce::TabbedComponent(juce::TabbedButtonBar::TabsAtTop)
         , color(color)
+        , seqComponent(color)
     {
         setColour(TabbedComponent::backgroundColourId, sidebarColour);
         // setColour(TabbedComponent::outlineColourId, sidebarColour);
