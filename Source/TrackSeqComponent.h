@@ -48,11 +48,11 @@ public:
         int midiRangeStart = verticalScrollbar.getCurrentRangeStart();
 
         // Draw Step Headers
-        g.setColour(juce::Colours::white);
+        g.setColour(seqHeaderColour);
         g.fillRect(0, 0, getWidth(), 20);
-        g.setColour(juce::Colours::black);
 
-        g.setFont(juce::Font(juce::FontOptions(12.0f)));
+        g.setColour(seqHeaderTextColour);
+        g.setFont(juce::Font(juce::FontOptions(11.0f)));
         for (int i = 0; i < numSteps; ++i) {
             int x = i * stepWidth;
             g.drawLine(x, 0, x, getHeight(), (i % 4 == 0) ? 2.0f : 1.0f);
@@ -81,11 +81,18 @@ public:
             g.setColour(seqRowSeparatorColour);
             g.drawLine(0, y, getWidth(), y);
 
+            // g.setColour(midiPitch % 12 == 0 ? seqNoteColour : seqNoteLighterColour);
             if (midiPitch % 12 == 0) {
                 g.setColour(seqNoteColour);
-                g.drawText(juce::MidiMessage::getMidiNoteName(midiPitch, true, true, 4),
-                    2, y, 40, noteHeight, juce::Justification::centredLeft);
+                g.setFont(juce::Font(juce::FontOptions(12.0f, juce::Font::bold)));
+            } else {
+                g.setColour(seqNoteLighterColour);
+                g.setFont(juce::Font(juce::FontOptions(10.0f, juce::Font::plain)));
             }
+            g.drawText(juce::MidiMessage::getMidiNoteName(midiPitch, true, true, 4), 2, y, 40, noteHeight, juce::Justification::centredLeft);
+            g.drawText(juce::MidiMessage::getMidiNoteName(midiPitch, true, true, 4), 2 + stepWidth * 16, y, 40, noteHeight, juce::Justification::centredLeft);
+            g.drawText(juce::MidiMessage::getMidiNoteName(midiPitch, true, true, 4), 2 + stepWidth * 32, y, 40, noteHeight, juce::Justification::centredLeft);
+            g.drawText(juce::MidiMessage::getMidiNoteName(midiPitch, true, true, 4), 2 + stepWidth * 48, y, 40, noteHeight, juce::Justification::centredLeft);
         }
 
         // Draw Beat & Bar Separations
