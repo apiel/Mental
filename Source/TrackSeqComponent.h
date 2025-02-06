@@ -180,9 +180,11 @@ public:
     }
     void mouseDrag(const juce::MouseEvent& event) override
     {
-        double deltaY = (event.position.y - dragStartPosition) / 24;
-        verticalScrollbar.setCurrentRangeStart(verticalScrollbar.getCurrentRangeStart() - deltaY);
-        dragStartPosition = event.position.y;
+        if (event.mods.isMiddleButtonDown()) {
+            double deltaY = (event.position.y - dragStartPosition) / 24;
+            verticalScrollbar.setCurrentRangeStart(verticalScrollbar.getCurrentRangeStart() - deltaY);
+            dragStartPosition = event.position.y;
+        }
     }
 
     void mouseWheelMove(const juce::MouseEvent& event, const juce::MouseWheelDetails& wheel) override
