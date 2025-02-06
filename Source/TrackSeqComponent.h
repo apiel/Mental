@@ -83,7 +83,7 @@ public:
         {
             int x = i * stepWidth;
             if (i % 16 == 0) g.setColour(juce::Colours::yellow); // Bar line
-            else if (i % 4 == 0) g.setColour(juce::Colours::darkgrey); // Beat line
+            else if (i % 4 == 0) g.setColour(juce::Colours::khaki); // Beat line
             else g.setColour(juce::Colours::grey);
 
             g.drawLine(x, 20, x, getHeight());
