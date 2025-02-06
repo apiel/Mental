@@ -45,7 +45,29 @@ public:
         addAndMakeVisible(verticalScrollbar);
         verticalScrollbar.setRangeLimits(12, 120); // C0 to C9 range
         verticalScrollbar.setCurrentRange(12, 12 + numNotes);
-        verticalScrollbar.setCurrentRangeStart(40);
+        verticalScrollbar.setCurrentRangeStart(((120 - 12) / 2) + 12 - numNotes / 2);
+
+        if (midiNotes.size() > 0) {
+            // Find min and max pitch from the MIDI notes
+            int minPitch = 127; // Max possible MIDI pitch
+            int maxPitch = 0; // Min possible MIDI pitch
+
+            for (const auto& note : midiNotes) {
+                if (note.pitch < minPitch)
+                    minPitch = note.pitch;
+                if (note.pitch > maxPitch)
+                    maxPitch = note.pitch;
+            }
+
+            // Calculate the center of the active note range
+            int midiRange = maxPitch - minPitch;
+            int midiCenter = (minPitch + maxPitch) / 2;
+
+            // Make sure we keep it within valid scroll limits
+            int scrollStart = juce::jlimit(12, 120 - numNotes, midiCenter - numNotes / 2 - midiRange / 2);
+            verticalScrollbar.setCurrentRangeStart(scrollStart);
+        }
+
         verticalScrollbar.addListener(this);
     }
 
