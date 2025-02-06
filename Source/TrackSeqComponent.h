@@ -1,10 +1,9 @@
 #pragma once
 
-#include <JuceHeader.h>
 #include "constants.h"
+#include <JuceHeader.h>
 
-class TrackSeqComponent : public juce::Component, public juce::ScrollBar::Listener
-{
+class TrackSeqComponent : public juce::Component, public juce::ScrollBar::Listener {
 protected:
     struct MidiNote {
         int startStep;
@@ -13,27 +12,29 @@ protected:
     };
 
     juce::Array<MidiNote> midiNotes;
-    juce::ScrollBar verticalScrollbar{ true };
+    juce::ScrollBar verticalScrollbar { true };
     int viewOffsetY = 0;
+    int numSteps = 64;
+    int numNotes = 36; // Now starting from C0 upwards
 
 public:
     TrackSeqComponent()
     {
         // Example MIDI Notes (Step, Pitch, Length)
-        midiNotes.add({ 0, 60, 4 });   // C4 spanning 4 steps
-        midiNotes.add({ 4, 62, 2 });   // D4 spanning 2 steps
-        midiNotes.add({ 8, 64, 8 });   // E4 spanning 8 steps
-        midiNotes.add({ 16, 67, 4 });  // G4 spanning 4 steps
-        midiNotes.add({ 20, 69, 6 });  // A4 spanning 6 steps
-        midiNotes.add({ 24, 72, 6 });  // C5 spanning 6 steps
-        midiNotes.add({ 32, 75, 6 });  // D#5 spanning 6 steps
-        midiNotes.add({ 40, 77, 6 });  // F5 spanning 6 steps
-        midiNotes.add({ 48, 80, 6 });  // G#5 spanning 6 steps
-        midiNotes.add({ 56, 83, 6 });  // B5 spanning 6 steps
+        midiNotes.add({ 0, 60, 4 }); // C4 spanning 4 steps
+        midiNotes.add({ 4, 62, 2 }); // D4 spanning 2 steps
+        midiNotes.add({ 8, 64, 8 }); // E4 spanning 8 steps
+        midiNotes.add({ 16, 67, 4 }); // G4 spanning 4 steps
+        midiNotes.add({ 20, 69, 6 }); // A4 spanning 6 steps
+        midiNotes.add({ 24, 72, 6 }); // C5 spanning 6 steps
+        midiNotes.add({ 32, 75, 6 }); // D#5 spanning 6 steps
+        midiNotes.add({ 40, 77, 6 }); // F5 spanning 6 steps
+        midiNotes.add({ 48, 80, 6 }); // G#5 spanning 6 steps
+        midiNotes.add({ 56, 83, 6 }); // B5 spanning 6 steps
 
         addAndMakeVisible(verticalScrollbar);
-        verticalScrollbar.setRangeLimits(0, 127);
-        verticalScrollbar.setCurrentRange(0, 12);
+        verticalScrollbar.setRangeLimits(12, 96); // C0 to C8 range
+        verticalScrollbar.setCurrentRange(12, numNotes);
         verticalScrollbar.addListener(this);
     }
 
@@ -41,28 +42,38 @@ public:
     {
         g.fillAll(bgColour);
 
-        int numSteps = 64;
-        int numNotes = 36; // Visible range
         int stepWidth = getWidth() / numSteps;
         int noteHeight = (getHeight() - 20) / numNotes; // Leave 20px for header
 
-        int midiRangeStart = verticalScrollbar.getCurrentRangeStart(); 
+        int midiRangeStart = verticalScrollbar.getCurrentRangeStart();
 
         // Draw Step Headers
         g.setColour(juce::Colours::white);
         g.fillRect(0, 0, getWidth(), 20);
         g.setColour(juce::Colours::black);
-        for (int i = 0; i < numSteps; ++i)
-        {
+
+        g.setFont(juce::Font(juce::FontOptions(12.0f)));
+        for (int i = 0; i < numSteps; ++i) {
             int x = i * stepWidth;
             g.drawLine(x, 0, x, getHeight(), (i % 4 == 0) ? 2.0f : 1.0f);
-            g.drawText(juce::String(i + 1), x + 2, 0, stepWidth, 20, juce::Justification::centred);
+
+            // Calculate the center of the text to rotate around
+            float centerX = x + stepWidth / 2.0f;
+            float centerY = 10.0f; // Adjust based on desired pivot point
+
+            g.saveState(); // Save the current state
+
+            // Rotate the text by -90 degrees (or any desired angle)
+            g.addTransform(juce::AffineTransform::rotation(juce::MathConstants<float>::pi * -0.25f, centerX, centerY));
+
+            // Draw the rotated text
+            g.drawText(juce::String(i + 1), x, 0, stepWidth, 20, juce::Justification::centred);
+            g.restoreState();
         }
 
         // Draw Grid with Piano Roll Styling & Note Names
-        for (int i = 0; i < numNotes; ++i)
-        {
-            int midiPitch = midiRangeStart + i;
+        for (int i = 0; i < numNotes; ++i) {
+            int midiPitch = midiRangeStart + (numNotes - i - 1); // Flip order so high notes are on top
             int y = 20 + i * noteHeight;
             bool isBlackKey = juce::MidiMessage::isMidiNoteBlack(midiPitch);
             g.setColour(isBlackKey ? juce::Colours::darkgrey : juce::Colours::lightgrey);
@@ -71,28 +82,29 @@ public:
             g.drawLine(0, y, getWidth(), y);
 
             // Draw note name at the start of every bar
-            if (midiPitch <= 127 && (midiPitch % 12 == 0)) {
+            if (midiPitch % 12 == 0) {
                 g.setColour(juce::Colours::black);
-                g.drawText(juce::MidiMessage::getMidiNoteName(midiPitch, true, true, 4), 
-                           2, y, 40, noteHeight, juce::Justification::centredLeft);
+                g.drawText(juce::MidiMessage::getMidiNoteName(midiPitch, true, true, 4),
+                    2, y, 40, noteHeight, juce::Justification::centredLeft);
             }
         }
 
         // Draw Beat & Bar Separations
-        for (int i = 0; i <= numSteps; ++i)
-        {
+        for (int i = 0; i <= numSteps; ++i) {
             int x = i * stepWidth;
-            if (i % 16 == 0) g.setColour(juce::Colours::yellow); // Bar line
-            else if (i % 4 == 0) g.setColour(juce::Colours::khaki); // Beat line
-            else g.setColour(juce::Colours::grey);
+            if (i % 16 == 0)
+                g.setColour(juce::Colours::yellow); // Bar line
+            else if (i % 4 == 0)
+                g.setColour(juce::Colours::khaki); // Beat line
+            else
+                g.setColour(juce::Colours::grey);
 
             g.drawLine(x, 20, x, getHeight());
         }
 
         // Draw MIDI Notes
         for (const auto& note : midiNotes) {
-            if (note.pitch >= midiRangeStart && note.pitch < midiRangeStart + numNotes)
-            {
+            if (note.pitch >= midiRangeStart && note.pitch < midiRangeStart + numNotes) {
                 int x = note.startStep * stepWidth;
                 int y = 20 + (numNotes - (note.pitch - midiRangeStart) - 1) * noteHeight;
                 int width = note.length * stepWidth;
@@ -113,11 +125,43 @@ public:
 
     void scrollBarMoved(juce::ScrollBar* scrollbar, double newRangeStart) override
     {
-        if (scrollbar == &verticalScrollbar)
-        {
+        if (scrollbar == &verticalScrollbar) {
             viewOffsetY = static_cast<int>(newRangeStart);
             repaint();
         }
+    }
+
+    bool keyPressed(const juce::KeyPress& key) override
+    {
+        return false;
+    }
+
+    void mouseWheelMove(const juce::MouseEvent& event, const juce::MouseWheelDetails& wheel) override
+    {
+        if (event.y < 20) {
+            // return false; // Ignore wheel event in header
+            return;
+        }
+
+        for (auto& note : midiNotes) {
+            int stepWidth = getWidth() / numSteps;
+            int noteHeight = (getHeight() - 20) / numNotes;
+            int midiRangeStart = verticalScrollbar.getCurrentRangeStart();
+            int y = 20 + (numNotes - (note.pitch - midiRangeStart) - 1) * noteHeight;
+
+            // If mouse is over a note, change length instead of scrolling
+            if (event.y >= y && event.y < y + noteHeight && event.x >= note.startStep * stepWidth && event.x < (note.startStep + note.length) * stepWidth) {
+                int delta = (wheel.deltaY > 0) ? 1 : -1;
+                note.length = juce::jmax(1, note.length + delta);
+                repaint();
+                // return true;
+                return;
+            }
+        }
+
+        // If not on a note, scroll normally
+        verticalScrollbar.setCurrentRangeStart(verticalScrollbar.getCurrentRangeStart() - wheel.deltaY * 2);
+        repaint();
     }
 
     int tabId = -1;
