@@ -46,6 +46,7 @@ public:
         verticalScrollbar.setRangeLimits(12, 120); // C0 to C9 range
         verticalScrollbar.setCurrentRange(12, 12 + numNotes);
         verticalScrollbar.setCurrentRangeStart(((120 - 12) / 2) + 12 - numNotes / 2);
+        verticalScrollbar.setColour(juce::ScrollBar::thumbColourId, color);
 
         if (midiNotes.size() > 0) {
             // Find min and max pitch from the MIDI notes
@@ -141,6 +142,7 @@ public:
             g.drawLine(x, headerH, x, getHeight());
         }
 
+        g.setFont(juce::Font(juce::FontOptions(10.0f, juce::Font::plain)));
         // Draw MIDI Notes
         for (const auto& note : midiNotes) {
             if (note.pitch >= midiRangeStart && note.pitch < midiRangeStart + numNotes) {
@@ -151,6 +153,9 @@ public:
 
                 g.setColour(color);
                 g.fillRect(x, y, width, height);
+
+                g.setColour(juce::Colours::white);
+                g.drawText(juce::MidiMessage::getMidiNoteName(note.pitch, true, true, 4), x + (note.length == 1 ? 0 : 2), y, width, noteHeight, juce::Justification::centredLeft);
             }
         }
     }
