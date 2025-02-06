@@ -36,7 +36,7 @@ public:
         midiNotes.add({ 56, 83, 6 }); // B5 spanning 6 steps
 
         addAndMakeVisible(verticalScrollbar);
-        verticalScrollbar.setRangeLimits(12, 96); // C0 to C8 range
+        verticalScrollbar.setRangeLimits(12, 120); // C0 to C9 range
         verticalScrollbar.setCurrentRange(12, numNotes);
         verticalScrollbar.addListener(this);
     }
@@ -48,7 +48,7 @@ public:
         int stepWidth = getWidth() / numSteps;
         int noteHeight = (getHeight() - 20) / numNotes; // Leave 20px for header
 
-        int midiRangeStart = verticalScrollbar.getCurrentRangeStart();
+        int midiRangeStart = (120 - (numNotes/2)) - verticalScrollbar.getCurrentRangeStart();
 
         // Draw Step Headers
         g.setColour(seqHeaderColour);
@@ -167,7 +167,7 @@ public:
         }
 
         // If not on a note, scroll normally
-        verticalScrollbar.setCurrentRangeStart(verticalScrollbar.getCurrentRangeStart() - wheel.deltaY * 2);
+        verticalScrollbar.setCurrentRangeStart(verticalScrollbar.getCurrentRangeStart() - wheel.deltaY * 6);
         repaint();
     }
 
