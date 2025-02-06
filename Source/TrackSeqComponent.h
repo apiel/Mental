@@ -76,9 +76,9 @@ public:
             int midiPitch = midiRangeStart + (numNotes - i - 1); // Flip order so high notes are on top
             int y = 20 + i * noteHeight;
             bool isBlackKey = juce::MidiMessage::isMidiNoteBlack(midiPitch);
-            g.setColour(isBlackKey ? juce::Colours::darkgrey : juce::Colours::lightgrey);
+            g.setColour(isBlackKey ? seqRowBlackKeyColour : seqRowWhiteKeyColour);
             g.fillRect(0, y, getWidth(), noteHeight);
-            g.setColour(juce::Colours::grey);
+            g.setColour(seqRowSeparatorColour);
             g.drawLine(0, y, getWidth(), y);
 
             // Draw note name at the start of every bar
@@ -93,11 +93,11 @@ public:
         for (int i = 0; i <= numSteps; ++i) {
             int x = i * stepWidth;
             if (i % 16 == 0)
-                g.setColour(juce::Colours::yellow); // Bar line
+                g.setColour(seqBarColour); // Bar line
             else if (i % 4 == 0)
-                g.setColour(juce::Colours::khaki); // Beat line
+                g.setColour(seqBeatColour); // Beat line
             else
-                g.setColour(juce::Colours::grey);
+                g.setColour(seqColSeparatorColour);
 
             g.drawLine(x, 20, x, getHeight());
         }

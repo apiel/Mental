@@ -4,3 +4,11 @@
 
 juce::Colour sidebarColour = juce::Colours::black.brighter(0.1);
 juce::Colour bgColour = juce::Colours::black.brighter(0.2);
+
+juce::Colour seqRowWhiteKeyColour = juce::Colours::black.brighter(0.3);
+juce::Colour seqRowBlackKeyColour = juce::Colours::black.brighter(0.35);
+juce::Colour seqRowSeparatorColour = juce::Colours::black.brighter(0.40);
+juce::Colour seqColSeparatorColour = juce::Colours::black.brighter(0.45);
+juce::Colour seqBarColour = juce::Colours::black.brighter(0.08);
+juce::Colour seqBeatColour = juce::Colours::black.brighter(0.20);
+
