@@ -151,6 +151,18 @@ public:
         return false;
     }
 
+    double dragStartPosition = 0.0;
+    void mouseDown(const juce::MouseEvent& event) override
+    {
+        dragStartPosition = event.position.y;
+    }
+    void mouseDrag(const juce::MouseEvent& event) override
+    {
+        double deltaY = (event.position.y - dragStartPosition) / 24;
+        verticalScrollbar.setCurrentRangeStart(verticalScrollbar.getCurrentRangeStart() - deltaY);
+        dragStartPosition = event.position.y;
+    }
+
     void mouseWheelMove(const juce::MouseEvent& event, const juce::MouseWheelDetails& wheel) override
     {
         int midiRangeStart = getMidiRangeStart();
