@@ -180,22 +180,36 @@ public:
         return false;
     }
 
-    double dragStartPosition = 0.0;
+    double dragStartPositionY = 0.0;
+    double dragStartPositionX = 0.0;
     void mouseDown(const juce::MouseEvent& event) override
     {
-        dragStartPosition = event.position.y;
+        dragStartPositionY = event.position.y;
+        dragStartPositionX = event.position.x;
     }
     void mouseDrag(const juce::MouseEvent& event) override
     {
         if (event.mods.isMiddleButtonDown()) {
-            double deltaY = (event.position.y - dragStartPosition) / 24;
+            double deltaY = (event.position.y - dragStartPositionY) / 24;
             verticalScrollbar.setCurrentRangeStart(verticalScrollbar.getCurrentRangeStart() - deltaY);
-            dragStartPosition = event.position.y;
+            dragStartPositionY = event.position.y;
         } else if (event.mods.isLeftButtonDown()) {
-            // double deltaY = (event.position.y - dragStartPosition);
-            // if (deltaY >= noteHeight) {
-
-            // }
+            double deltaY = (event.position.y - dragStartPositionY);
+            if (deltaY >= noteHeight) {
+                MidiNote* note = getMidiNoteAtPosition(dragStartPositionX, dragStartPositionY);
+                if (note != nullptr) {
+                    note->pitch -= 1;
+                    repaint();
+                    dragStartPositionY = event.position.y;
+                }
+            } else if (-deltaY >= noteHeight) {
+                MidiNote* note = getMidiNoteAtPosition(dragStartPositionX, dragStartPositionY);
+                if (note != nullptr) {
+                    note->pitch += 1;
+                    repaint();
+                    dragStartPositionY = event.position.y;
+                }
+            }
         }
     }
 
@@ -205,7 +219,7 @@ public:
         int stepWidth = getWidth() / numSteps;
         int noteHeight = (getHeight() - headerHeight) / numNotes;
 
-        MidiNote* note = getMidiNoteAtPosition(event);
+        MidiNote* note = getMidiNoteAtPosition(event.x, event.y);
         if (note != nullptr) {
             int delta = (wheel.deltaY > 0) ? 1 : -1;
             note->length = juce::jmax(1, note->length + delta);
@@ -218,13 +232,13 @@ public:
         repaint();
     }
 
-    MidiNote* getMidiNoteAtPosition(const juce::MouseEvent& event)
+    MidiNote* getMidiNoteAtPosition(double eventX, double eventY)
     {
         int midiRangeStart = getMidiRangeStart();
         for (auto& note : midiNotes) {
             int y = headerHeight + (numNotes - (note.pitch - midiRangeStart) - 1) * noteHeight;
             // If mouse is over a note, change length instead of scrolling
-            if (event.y >= y && event.y < y + noteHeight && event.x >= note.startStep * stepWidth && event.x < (note.startStep + note.length) * stepWidth) {
+            if (eventY >= y && eventY < y + noteHeight && eventX >= note.startStep * stepWidth && eventX < (note.startStep + note.length) * stepWidth) {
                 return &note;
             }
         }
