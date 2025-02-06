@@ -81,9 +81,8 @@ public:
             g.setColour(seqRowSeparatorColour);
             g.drawLine(0, y, getWidth(), y);
 
-            // Draw note name at the start of every bar
             if (midiPitch % 12 == 0) {
-                g.setColour(juce::Colours::black);
+                g.setColour(seqNoteColour);
                 g.drawText(juce::MidiMessage::getMidiNoteName(midiPitch, true, true, 4),
                     2, y, 40, noteHeight, juce::Justification::centredLeft);
             }

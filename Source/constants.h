@@ -11,4 +11,5 @@ juce::Colour seqRowSeparatorColour = juce::Colours::black.brighter(0.40);
 juce::Colour seqColSeparatorColour = juce::Colours::black.brighter(0.45);
 juce::Colour seqBarColour = juce::Colours::black.brighter(0.08);
 juce::Colour seqBeatColour = juce::Colours::black.brighter(0.20);
+juce::Colour seqNoteColour = juce::Colours::white.darker(0.10);
 
