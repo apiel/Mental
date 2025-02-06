@@ -5,6 +5,8 @@
 
 class TrackSeqComponent : public juce::Component, public juce::ScrollBar::Listener {
 protected:
+    int headerH = 20;
+
     struct MidiNote {
         int startStep;
         int pitch;
@@ -42,7 +44,8 @@ public:
 
         addAndMakeVisible(verticalScrollbar);
         verticalScrollbar.setRangeLimits(12, 120); // C0 to C9 range
-        verticalScrollbar.setCurrentRange(12, numNotes);
+        verticalScrollbar.setCurrentRange(12, 12 + numNotes);
+        verticalScrollbar.setCurrentRangeStart(40);
         verticalScrollbar.addListener(this);
     }
 
@@ -51,13 +54,13 @@ public:
         g.fillAll(bgColour);
 
         int stepWidth = getWidth() / numSteps;
-        int noteHeight = (getHeight() - 20) / numNotes; // Leave 20px for header
+        int noteHeight = (getHeight() - headerH) / numNotes; // Leave 20px for header
 
         int midiRangeStart = getMidiRangeStart();
 
         // Draw Step Headers
         g.setColour(seqHeaderColour);
-        g.fillRect(0, 0, getWidth(), 20);
+        g.fillRect(0, 0, getWidth(), headerH);
 
         g.setColour(seqHeaderTextColour);
         g.setFont(juce::Font(juce::FontOptions(11.0f)));
@@ -75,14 +78,14 @@ public:
             g.addTransform(juce::AffineTransform::rotation(juce::MathConstants<float>::pi * -0.25f, centerX, centerY));
 
             // Draw the rotated text
-            g.drawText(juce::String(i + 1), x, 0, stepWidth, 20, juce::Justification::centred);
+            g.drawText(juce::String(i + 1), x, 0, stepWidth, headerH, juce::Justification::centred);
             g.restoreState();
         }
 
         // Draw Grid with Piano Roll Styling & Note Names
         for (int i = 0; i < numNotes; ++i) {
             int midiPitch = midiRangeStart + (numNotes - i - 1); // Flip order so high notes are on top
-            int y = 20 + i * noteHeight;
+            int y = headerH + i * noteHeight;
             bool isBlackKey = juce::MidiMessage::isMidiNoteBlack(midiPitch);
             g.setColour(isBlackKey ? seqRowBlackKeyColour : seqRowWhiteKeyColour);
             g.fillRect(0, y, getWidth(), noteHeight);
@@ -113,14 +116,14 @@ public:
             else
                 g.setColour(seqColSeparatorColour);
 
-            g.drawLine(x, 20, x, getHeight());
+            g.drawLine(x, headerH, x, getHeight());
         }
 
         // Draw MIDI Notes
         for (const auto& note : midiNotes) {
             if (note.pitch >= midiRangeStart && note.pitch < midiRangeStart + numNotes) {
                 int x = note.startStep * stepWidth;
-                int y = 20 + (numNotes - (note.pitch - midiRangeStart) - 1) * noteHeight;
+                int y = headerH + (numNotes - (note.pitch - midiRangeStart) - 1) * noteHeight;
                 int width = note.length * stepWidth;
                 int height = noteHeight;
 
@@ -132,7 +135,7 @@ public:
 
     void resized() override
     {
-        verticalScrollbar.setBounds(getWidth() - 10, 20, 10, getHeight() - 20);
+        verticalScrollbar.setBounds(getWidth() - 10, headerH, 10, getHeight() - headerH);
     }
 
     void scrollBarMoved(juce::ScrollBar* scrollbar, double newRangeStart) override
@@ -150,16 +153,11 @@ public:
 
     void mouseWheelMove(const juce::MouseEvent& event, const juce::MouseWheelDetails& wheel) override
     {
-        if (event.y < 20) {
-            // return false; // Ignore wheel event in header
-            return;
-        }
-
         int midiRangeStart = getMidiRangeStart();
         int stepWidth = getWidth() / numSteps;
-        int noteHeight = (getHeight() - 20) / numNotes;
+        int noteHeight = (getHeight() - headerH) / numNotes;
         for (auto& note : midiNotes) {
-            int y = 20 + (numNotes - (note.pitch - midiRangeStart) - 1) * noteHeight;
+            int y = headerH + (numNotes - (note.pitch - midiRangeStart) - 1) * noteHeight;
             // If mouse is over a note, change length instead of scrolling
             if (event.y >= y && event.y < y + noteHeight && event.x >= note.startStep * stepWidth && event.x < (note.startStep + note.length) * stepWidth) {
                 int delta = (wheel.deltaY > 0) ? 1 : -1;
