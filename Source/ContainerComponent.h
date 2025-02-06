@@ -4,6 +4,7 @@
 
 #include "TrackComponent.h"
 #include "MasterComponent.h"
+// #include "constants.h"
 
 class ContainerComponent : public juce::TabbedComponent {
 protected:
@@ -15,6 +16,10 @@ public:
     ContainerComponent()
         : juce::TabbedComponent(juce::TabbedButtonBar::TabsAtLeft)
     {
+        // setColour(TabbedComponent::backgroundColourId, sidebarColour);
+        // setColour(TabbedComponent::outlineColourId, sidebarColour);
+        setOutline(0);
+
         addTab("Master", juce::Colours::grey, &masterComponent, false);
         masterComponent.tabId = 0;
         addTab("Track 1", juce::Colours::orange, &trackComponent1, false);

@@ -1,8 +1,7 @@
 #pragma once
 
 #include <JuceHeader.h>
-
-juce::Colour sidebarColour = juce::Colours::black.brighter(0.1);
+#include "constants.h"
 
 class FlatButtonLookAndFeel : public juce::LookAndFeel_V4 {
 public:

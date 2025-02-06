@@ -2,6 +2,7 @@
 
 #include <JuceHeader.h>
 
+#include "constants.h"
 #include "TrackAudioComponent.h"
 
 class TrackComponent : public juce::TabbedComponent {
@@ -12,7 +13,12 @@ public:
     TrackComponent()
         : juce::TabbedComponent(juce::TabbedButtonBar::TabsAtTop)
     {
-        addTab("Audio", juce::Colours::grey, &audioComponent, false);
+        setColour(TabbedComponent::backgroundColourId, sidebarColour);
+        // setColour(TabbedComponent::outlineColourId, sidebarColour);
+        setOutline(0);
+
+        // addTab("Audio", juce::Colours::grey, &audioComponent, false);
+        addTab("Audio", juce::Colours::blue, &audioComponent, false);
         audioComponent.tabId = 0;
 
         setCurrentTabIndex(0);
