@@ -3,8 +3,8 @@
 #include <JuceHeader.h>
 
 #include "NoteToolboxComponent.h"
-#include "constants.h"
 #include "Step.h"
+#include "constants.h"
 
 class TrackSeqComponent : public juce::Component, public juce::ScrollBar::Listener {
 protected:
@@ -244,6 +244,8 @@ public:
             int clickedStep = event.position.x / stepWidth;
             int clickedPitch = getMidiRangeStart() + (numNotes - (event.position.y - headerHeight) / stepHeight);
             steps.add({ clickedStep, clickedPitch, 4 });
+            selectedNote = &steps.getReference(steps.size() - 1);
+            showToolbox();
             repaint();
         }
     }

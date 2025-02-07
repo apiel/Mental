@@ -2,8 +2,7 @@
 
 #include <JuceHeader.h>
 
-class ScrollableComboBox : public juce::ComboBox
-{
+class ScrollableComboBox : public juce::ComboBox {
 public:
     ScrollableComboBox()
     {
@@ -23,14 +22,11 @@ public:
     }
 
 private:
-    class CustomLookAndFeel : public juce::LookAndFeel_V4
-    {
+    class CustomLookAndFeel : public juce::LookAndFeel_V4 {
     public:
         juce::PopupMenu::Options getOptionsForComboBoxPopupMenu(juce::ComboBox& box, juce::Label&) override
         {
-            return juce::PopupMenu::Options().withTargetComponent(&box)
-                                             .withMinimumWidth(box.getWidth())
-                                             .withPreferredPopupDirection(juce::PopupMenu::Options::PopupDirection::upwards);
+            return juce::PopupMenu::Options().withTargetComponent(&box).withMinimumWidth(box.getWidth()).withPreferredPopupDirection(juce::PopupMenu::Options::PopupDirection::upwards);
         }
     };
 
@@ -136,14 +132,18 @@ public:
         g.fillAll(juce::Colours::darkgrey.withAlpha(0.7f)); // Semi-transparent dark grey background
     }
 
-    void resized() override
-    {
-        auto area = getLocalBounds().reduced(5);
-        auto itemWidth = area.getWidth() / 5;
-        pitchLabel.setBounds(area.removeFromLeft(itemWidth).reduced(2));
-        pitchSlider.setBounds(area.removeFromLeft(itemWidth).reduced(2));
-        lengthLabel.setBounds(area.removeFromLeft(itemWidth).reduced(2));
-        lengthSelector.setBounds(area.removeFromLeft(itemWidth).reduced(2));
-        deleteButton.setBounds(area.removeFromLeft(itemWidth).reduced(2));
-    }
+   void resized() override
+{
+    auto area = getLocalBounds().reduced(5);
+    
+    // Adjust widths dynamically based on component sizes
+    auto labelWidth = 50;  // Fixed width for labels
+
+    pitchLabel.setBounds(area.removeFromLeft(labelWidth).reduced(2));
+    pitchSlider.setBounds(area.removeFromLeft(200).reduced(2));
+    lengthLabel.setBounds(area.removeFromLeft(labelWidth).reduced(2));
+    lengthSelector.setBounds(area.removeFromLeft(200).reduced(2));
+    deleteButton.setBounds(area.removeFromLeft(100).reduced(2));
+}
+
 };
