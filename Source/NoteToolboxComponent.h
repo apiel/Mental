@@ -2,7 +2,48 @@
 
 #include <JuceHeader.h>
 
+class ScrollableComboBox : public juce::ComboBox
+{
+public:
+    ScrollableComboBox()
+    {
+        setLookAndFeel(&customLookAndFeel);
+    }
+
+    ~ScrollableComboBox() override
+    {
+        setLookAndFeel(nullptr); // Clean up
+    }
+
+    void mouseWheelMove(const juce::MouseEvent&, const juce::MouseWheelDetails& wheel) override
+    {
+        int currentId = getSelectedId();
+        int newId = juce::jlimit(1, 64, currentId + (wheel.deltaY > 0 ? 1 : -1));
+        setSelectedId(newId, juce::sendNotification);
+    }
+
+private:
+    class CustomLookAndFeel : public juce::LookAndFeel_V4
+    {
+    public:
+        juce::PopupMenu::Options getOptionsForComboBoxPopupMenu(juce::ComboBox& box, juce::Label&) override
+        {
+            return juce::PopupMenu::Options().withTargetComponent(&box)
+                                             .withMinimumWidth(box.getWidth())
+                                             .withPreferredPopupDirection(juce::PopupMenu::Options::PopupDirection::upwards);
+        }
+    };
+
+    CustomLookAndFeel customLookAndFeel;
+};
+
 class NoteToolboxComponent : public juce::Component {
+private:
+    juce::Label pitchLabel, lengthLabel;
+    juce::Slider pitchSlider;
+    ScrollableComboBox lengthSelector;
+    juce::DrawableButton deleteButton { "Delete", juce::DrawableButton::ImageFitted };
+
 public:
     std::function<void(int)> onPitchChange;
     std::function<void(int)> onLengthChange;
@@ -57,8 +98,6 @@ public:
         // Lid
         path.startNewSubPath(4, 4);
         path.lineTo(16, 4);
-        // path.lineTo(16, 6);
-        // path.lineTo(4, 6);
         path.closeSubPath();
 
         // Handle
@@ -107,10 +146,4 @@ public:
         lengthSelector.setBounds(area.removeFromLeft(itemWidth).reduced(2));
         deleteButton.setBounds(area.removeFromLeft(itemWidth).reduced(2));
     }
-
-private:
-    juce::Label pitchLabel, lengthLabel;
-    juce::Slider pitchSlider;
-    juce::ComboBox lengthSelector;
-    juce::DrawableButton deleteButton { "Delete", juce::DrawableButton::ImageFitted };
 };
