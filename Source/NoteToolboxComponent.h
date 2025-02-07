@@ -13,7 +13,7 @@ public:
         addAndMakeVisible(pitchLabel);
         addAndMakeVisible(pitchSlider);
         addAndMakeVisible(lengthLabel);
-        addAndMakeVisible(lengthSlider);
+        addAndMakeVisible(lengthSelector);
         addAndMakeVisible(deleteButton);
 
         pitchLabel.setText("Pitch:", juce::dontSendNotification);
@@ -25,13 +25,56 @@ public:
                 onPitchChange((int)pitchSlider.getValue());
         };
 
-        lengthSlider.setRange(1, 16, 1);
-        lengthSlider.onValueChange = [this] {
-            if (onLengthChange)
-                onLengthChange((int)lengthSlider.getValue());
-        };
+        for (int i = 1; i <= 64; ++i)
+            lengthSelector.addItem(juce::String(i), i);
 
-        deleteButton.setButtonText("Delete");
+        lengthSelector.onChange = [this] {
+            if (onLengthChange)
+                onLengthChange(lengthSelector.getSelectedId());
+        };
+        lengthSelector.setSelectedId(4, juce::dontSendNotification);
+
+        deleteButton.setButtonText("");
+        deleteButton.setClickingTogglesState(false);
+
+        auto trashIcon = std::make_unique<juce::DrawablePath>();
+        juce::Path path;
+
+        // Lid
+        path.startNewSubPath(4, 4);
+        path.lineTo(16, 4);
+        // path.lineTo(16, 6);
+        // path.lineTo(4, 6);
+        path.closeSubPath();
+
+        // Handle
+        path.startNewSubPath(8, 2);
+        path.lineTo(12, 2);
+        path.lineTo(12, 4);
+        path.lineTo(8, 4);
+        path.closeSubPath();
+
+        // Trash body
+        path.startNewSubPath(6, 6);
+        path.lineTo(14, 6);
+        path.lineTo(13, 14);
+        path.lineTo(7, 14);
+        path.closeSubPath();
+
+        // Vertical ridges
+        path.startNewSubPath(8, 8);
+        path.lineTo(8.5, 12);
+        path.startNewSubPath(10, 8);
+        path.lineTo(10, 12);
+        path.startNewSubPath(12, 8);
+        path.lineTo(11.5, 12);
+
+        trashIcon->setPath(path);
+        trashIcon->setFill(juce::Colours::grey);
+        trashIcon->setStrokeFill(juce::Colours::white);
+        trashIcon->setStrokeType(juce::PathStrokeType(0.5f));
+
+        deleteButton.setImages(trashIcon.get());
         deleteButton.onClick = [this] {
             if (onDelete)
                 onDelete();
@@ -41,7 +84,7 @@ public:
     void setNoteDetails(int pitch, int length)
     {
         pitchSlider.setValue(pitch, juce::dontSendNotification);
-        lengthSlider.setValue(length, juce::dontSendNotification);
+        lengthSelector.setSelectedId(length, juce::dontSendNotification);
     }
 
     void paint(juce::Graphics& g) override
@@ -56,12 +99,13 @@ public:
         pitchLabel.setBounds(area.removeFromLeft(itemWidth).reduced(2));
         pitchSlider.setBounds(area.removeFromLeft(itemWidth).reduced(2));
         lengthLabel.setBounds(area.removeFromLeft(itemWidth).reduced(2));
-        lengthSlider.setBounds(area.removeFromLeft(itemWidth).reduced(2));
+        lengthSelector.setBounds(area.removeFromLeft(itemWidth).reduced(2));
         deleteButton.setBounds(area.removeFromLeft(itemWidth).reduced(2));
     }
 
 private:
     juce::Label pitchLabel, lengthLabel;
-    juce::Slider pitchSlider, lengthSlider;
-    juce::TextButton deleteButton;
+    juce::Slider pitchSlider;
+    juce::ComboBox lengthSelector;
+    juce::DrawableButton deleteButton { "Delete", juce::DrawableButton::ImageFitted };
 };
