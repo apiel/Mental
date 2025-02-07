@@ -9,7 +9,7 @@
 class TrackSeqComponent : public juce::Component, public juce::ScrollBar::Listener {
 protected:
     int headerHeight = 20;
-    int noteHeight = 0;
+    int stepHeight = 0;
     int stepWidth = 0;
 
     juce::Array<Step> steps;
@@ -88,18 +88,18 @@ public:
         verticalScrollbar.setColour(juce::ScrollBar::thumbColourId, color);
 
         if (steps.size() > 0) {
-            // Find min and max pitch from the MIDI notes
+            // Find min and max pitch from the MIDI steps
             int minPitch = 127; // Max possible MIDI pitch
             int maxPitch = 0; // Min possible MIDI pitch
 
-            for (const auto& note : steps) {
-                if (note.pitch < minPitch)
-                    minPitch = note.pitch;
-                if (note.pitch > maxPitch)
-                    maxPitch = note.pitch;
+            for (const auto& step : steps) {
+                if (step.pitch < minPitch)
+                    minPitch = step.pitch;
+                if (step.pitch > maxPitch)
+                    maxPitch = step.pitch;
             }
 
-            // Calculate the center of the active note range
+            // Calculate the center of the active step range
             int midiRange = maxPitch - minPitch;
             int midiCenter = (minPitch + maxPitch) / 2;
 
@@ -143,11 +143,11 @@ public:
 
         // Draw Grid with Piano Roll Styling & Note Names
         for (int i = 0; i < numNotes; ++i) {
-            int midiPitch = midiRangeStart + (numNotes - i - 1); // Flip order so high notes are on top
-            int y = headerHeight + i * noteHeight;
+            int midiPitch = midiRangeStart + (numNotes - i - 1); // Flip order so high steps are on top
+            int y = headerHeight + i * stepHeight;
             bool isBlackKey = juce::MidiMessage::isMidiNoteBlack(midiPitch);
             g.setColour(isBlackKey ? seqRowBlackKeyColour : seqRowWhiteKeyColour);
-            g.fillRect(0, y, getWidth(), noteHeight);
+            g.fillRect(0, y, getWidth(), stepHeight);
             g.setColour(seqRowSeparatorColour);
             g.drawLine(0, y, getWidth(), y);
 
@@ -159,10 +159,10 @@ public:
                 g.setColour(seqNoteLighterColour);
                 g.setFont(juce::Font(juce::FontOptions(10.0f, juce::Font::plain)));
             }
-            g.drawText(juce::MidiMessage::getMidiNoteName(midiPitch, true, true, 4), 2, y, 40, noteHeight, juce::Justification::centredLeft);
-            g.drawText(juce::MidiMessage::getMidiNoteName(midiPitch, true, true, 4), 2 + stepWidth * 16, y, 40, noteHeight, juce::Justification::centredLeft);
-            g.drawText(juce::MidiMessage::getMidiNoteName(midiPitch, true, true, 4), 2 + stepWidth * 32, y, 40, noteHeight, juce::Justification::centredLeft);
-            g.drawText(juce::MidiMessage::getMidiNoteName(midiPitch, true, true, 4), 2 + stepWidth * 48, y, 40, noteHeight, juce::Justification::centredLeft);
+            g.drawText(juce::MidiMessage::getMidiNoteName(midiPitch, true, true, 4), 2, y, 40, stepHeight, juce::Justification::centredLeft);
+            g.drawText(juce::MidiMessage::getMidiNoteName(midiPitch, true, true, 4), 2 + stepWidth * 16, y, 40, stepHeight, juce::Justification::centredLeft);
+            g.drawText(juce::MidiMessage::getMidiNoteName(midiPitch, true, true, 4), 2 + stepWidth * 32, y, 40, stepHeight, juce::Justification::centredLeft);
+            g.drawText(juce::MidiMessage::getMidiNoteName(midiPitch, true, true, 4), 2 + stepWidth * 48, y, 40, stepHeight, juce::Justification::centredLeft);
         }
 
         // Draw Beat & Bar Separations
@@ -180,25 +180,25 @@ public:
 
         g.setFont(juce::Font(juce::FontOptions(10.0f, juce::Font::plain)));
         // Draw MIDI Notes
-        for (const auto& note : steps) {
-            if (note.pitch >= midiRangeStart && note.pitch < midiRangeStart + numNotes) {
-                int x = note.startStep * stepWidth;
-                int y = headerHeight + (numNotes - (note.pitch - midiRangeStart) - 1) * noteHeight;
-                int width = note.length * stepWidth;
-                int height = noteHeight;
+        for (const auto& step : steps) {
+            if (step.pitch >= midiRangeStart && step.pitch < midiRangeStart + numNotes) {
+                int x = step.startStep * stepWidth;
+                int y = headerHeight + (numNotes - (step.pitch - midiRangeStart) - 1) * stepHeight;
+                int width = step.length * stepWidth;
+                int height = stepHeight;
 
                 g.setColour(color);
                 g.fillRect(x, y, width, height);
 
                 g.setColour(juce::Colours::white);
-                g.drawText(juce::MidiMessage::getMidiNoteName(note.pitch, true, true, 4), x + (note.length == 1 ? 0 : 2), y, width, noteHeight, juce::Justification::centredLeft);
+                g.drawText(juce::MidiMessage::getMidiNoteName(step.pitch, true, true, 4), x + (step.length == 1 ? 0 : 2), y, width, stepHeight, juce::Justification::centredLeft);
             }
         }
     }
 
     void resized() override
     {
-        noteHeight = (getHeight() - headerHeight) / numNotes; // Leave 20px for header
+        stepHeight = (getHeight() - headerHeight) / numNotes; // Leave 20px for header
         stepWidth = getWidth() / numSteps;
 
         verticalScrollbar.setBounds(getWidth() - 10, headerHeight, 10, getHeight() - headerHeight);
@@ -242,7 +242,7 @@ public:
     {
         if (getMidiNoteAtPosition(event.position.x, event.position.y) == nullptr) {
             int clickedStep = event.position.x / stepWidth;
-            int clickedPitch = getMidiRangeStart() + (numNotes - (event.position.y - headerHeight) / noteHeight);
+            int clickedPitch = getMidiRangeStart() + (numNotes - (event.position.y - headerHeight) / stepHeight);
             steps.add({ clickedStep, clickedPitch, 4 });
             repaint();
         }
@@ -256,12 +256,12 @@ public:
             dragStartPositionY = event.position.y;
         } else if (selectedNote != nullptr && event.mods.isLeftButtonDown()) {
             double deltaY = (event.position.y - dragStartPositionY);
-            if (deltaY >= noteHeight) {
-                selectedNote->pitch -= (int)(deltaY / noteHeight);
+            if (deltaY >= stepHeight) {
+                selectedNote->pitch -= (int)(deltaY / stepHeight);
                 repaint();
                 dragStartPositionY = event.position.y;
-            } else if (-deltaY >= noteHeight) {
-                selectedNote->pitch += (int)((-deltaY) / noteHeight);
+            } else if (-deltaY >= stepHeight) {
+                selectedNote->pitch += (int)((-deltaY) / stepHeight);
                 repaint();
                 dragStartPositionY = event.position.y;
             }
@@ -283,33 +283,33 @@ public:
     {
         int midiRangeStart = getMidiRangeStart();
         int stepWidth = getWidth() / numSteps;
-        int noteHeight = (getHeight() - headerHeight) / numNotes;
+        int stepHeight = (getHeight() - headerHeight) / numNotes;
 
-        Step* note = getMidiNoteAtPosition(event.x, event.y);
-        if (note != nullptr) {
+        Step* step = getMidiNoteAtPosition(event.x, event.y);
+        if (step != nullptr) {
             int delta = (wheel.deltaY > 0) ? 1 : -1;
-            note->length = juce::jmax(1, note->length + delta);
+            step->length = juce::jmax(1, step->length + delta);
             repaint();
             return;
         }
 
-        // If not on a note, scroll normally
+        // If not on a step, scroll normally
         verticalScrollbar.setCurrentRangeStart(verticalScrollbar.getCurrentRangeStart() - wheel.deltaY * 6);
         repaint();
     }
 
-    // TODO when key A is pressed, add a new note after the last edited/move note
-    // if no note has been edited, then add a new note after the last note
-    // if there is no note at all then add a new note at the beginning in middle screeen..
+    // TODO when key A is pressed, add a new step after the last edited/move step
+    // if no step has been edited, then add a new step after the last step
+    // if there is no step at all then add a new step at the beginning in middle screeen..
 
     Step* getMidiNoteAtPosition(double eventX, double eventY)
     {
         int midiRangeStart = getMidiRangeStart();
-        for (auto& note : steps) {
-            int y = headerHeight + (numNotes - (note.pitch - midiRangeStart) - 1) * noteHeight;
-            // If mouse is over a note, change length instead of scrolling
-            if (eventY >= y && eventY < y + noteHeight && eventX >= note.startStep * stepWidth && eventX < (note.startStep + note.length) * stepWidth) {
-                return &note;
+        for (auto& step : steps) {
+            int y = headerHeight + (numNotes - (step.pitch - midiRangeStart) - 1) * stepHeight;
+            // If mouse is over a step, change length instead of scrolling
+            if (eventY >= y && eventY < y + stepHeight && eventX >= step.startStep * stepWidth && eventX < (step.startStep + step.length) * stepWidth) {
+                return &step;
             }
         }
         return nullptr;
