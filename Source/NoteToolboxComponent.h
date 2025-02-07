@@ -38,6 +38,20 @@ public:
         deleteButton.setClickingTogglesState(false);
 
         auto trashIcon = std::make_unique<juce::DrawablePath>();
+        setTrashIcon(trashIcon.get());
+        trashIcon->setFill(juce::Colours::grey);
+        trashIcon->setStrokeFill(juce::Colours::white);
+        trashIcon->setStrokeType(juce::PathStrokeType(0.5f));
+
+        deleteButton.setImages(trashIcon.get());
+        deleteButton.onClick = [this] {
+            if (onDelete)
+                onDelete();
+        };
+    }
+
+    void setTrashIcon(juce::DrawablePath* icon)
+    {
         juce::Path path;
 
         // Lid
@@ -69,16 +83,7 @@ public:
         path.startNewSubPath(12, 8);
         path.lineTo(11.5, 12);
 
-        trashIcon->setPath(path);
-        trashIcon->setFill(juce::Colours::grey);
-        trashIcon->setStrokeFill(juce::Colours::white);
-        trashIcon->setStrokeType(juce::PathStrokeType(0.5f));
-
-        deleteButton.setImages(trashIcon.get());
-        deleteButton.onClick = [this] {
-            if (onDelete)
-                onDelete();
-        };
+        icon->setPath(path);
     }
 
     void setNoteDetails(int pitch, int length)
