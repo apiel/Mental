@@ -4,6 +4,7 @@
 
 #include "NoteToolboxComponent.h"
 #include "constants.h"
+#include "Step.h"
 
 class TrackSeqComponent : public juce::Component, public juce::ScrollBar::Listener {
 protected:
@@ -11,13 +12,7 @@ protected:
     int noteHeight = 0;
     int stepWidth = 0;
 
-    struct MidiNote {
-        int startStep;
-        int pitch;
-        int length;
-    };
-
-    juce::Array<MidiNote> midiNotes;
+    juce::Array<Step> steps;
     juce::ScrollBar verticalScrollbar { true };
     int viewOffsetY = 0;
     int numSteps = 64;
@@ -28,7 +23,7 @@ protected:
         return (120 - 24) - verticalScrollbar.getCurrentRangeStart();
     }
 
-    std::unique_ptr<NoteToolboxComponent> toolbox;
+    std::unique_ptr<NoteToolboxComponent> toolbox = nullptr;
     void showToolbox()
     {
         if (!toolbox) {
@@ -49,7 +44,7 @@ protected:
         };
         toolbox->onDelete = [this]() {
             if (selectedNote) {
-                midiNotes.remove(selectedNote);
+                steps.remove(selectedNote);
                 selectedNote = nullptr;
                 toolbox.reset();
                 repaint();
@@ -59,11 +54,13 @@ protected:
         updateToolboxBounds();
     }
 
+    int toolboxWidth = 600;
+    int toolboxHeight = 60;
     void updateToolboxBounds()
     {
-        int toolboxWidth = 180;
-        int toolboxHeight = 120;
-        toolbox->setBounds(getWidth() - toolboxWidth - 20, getHeight() - toolboxHeight - 20, toolboxWidth, toolboxHeight);
+        if (toolbox) {
+            toolbox->setBounds(getWidth() - toolboxWidth - 20, getHeight() - toolboxHeight - 20, toolboxWidth, toolboxHeight);
+        }
     }
 
 public:
@@ -73,16 +70,16 @@ public:
         : color(color)
     {
         // Example MIDI Notes (Step, Pitch, Length)
-        midiNotes.add({ 0, 60, 4 }); // C4 spanning 4 steps
-        midiNotes.add({ 4, 62, 2 }); // D4 spanning 2 steps
-        midiNotes.add({ 8, 64, 8 }); // E4 spanning 8 steps
-        midiNotes.add({ 16, 67, 4 }); // G4 spanning 4 steps
-        midiNotes.add({ 20, 69, 6 }); // A4 spanning 6 steps
-        midiNotes.add({ 24, 72, 6 }); // C5 spanning 6 steps
-        midiNotes.add({ 32, 75, 6 }); // D#5 spanning 6 steps
-        midiNotes.add({ 40, 77, 6 }); // F5 spanning 6 steps
-        midiNotes.add({ 48, 80, 6 }); // G#5 spanning 6 steps
-        midiNotes.add({ 56, 83, 6 }); // B5 spanning 6 steps
+        steps.add({ 0, 60, 4 }); // C4 spanning 4 steps
+        steps.add({ 4, 62, 2 }); // D4 spanning 2 steps
+        steps.add({ 8, 64, 8 }); // E4 spanning 8 steps
+        steps.add({ 16, 67, 4 }); // G4 spanning 4 steps
+        steps.add({ 20, 69, 6 }); // A4 spanning 6 steps
+        steps.add({ 24, 72, 6 }); // C5 spanning 6 steps
+        steps.add({ 32, 75, 6 }); // D#5 spanning 6 steps
+        steps.add({ 40, 77, 6 }); // F5 spanning 6 steps
+        steps.add({ 48, 80, 6 }); // G#5 spanning 6 steps
+        steps.add({ 56, 83, 6 }); // B5 spanning 6 steps
 
         addAndMakeVisible(verticalScrollbar);
         verticalScrollbar.setRangeLimits(12, 120); // C0 to C9 range
@@ -90,12 +87,12 @@ public:
         verticalScrollbar.setCurrentRangeStart(((120 - 12) / 2) + 12 - numNotes / 2);
         verticalScrollbar.setColour(juce::ScrollBar::thumbColourId, color);
 
-        if (midiNotes.size() > 0) {
+        if (steps.size() > 0) {
             // Find min and max pitch from the MIDI notes
             int minPitch = 127; // Max possible MIDI pitch
             int maxPitch = 0; // Min possible MIDI pitch
 
-            for (const auto& note : midiNotes) {
+            for (const auto& note : steps) {
                 if (note.pitch < minPitch)
                     minPitch = note.pitch;
                 if (note.pitch > maxPitch)
@@ -183,7 +180,7 @@ public:
 
         g.setFont(juce::Font(juce::FontOptions(10.0f, juce::Font::plain)));
         // Draw MIDI Notes
-        for (const auto& note : midiNotes) {
+        for (const auto& note : steps) {
             if (note.pitch >= midiRangeStart && note.pitch < midiRangeStart + numNotes) {
                 int x = note.startStep * stepWidth;
                 int y = headerHeight + (numNotes - (note.pitch - midiRangeStart) - 1) * noteHeight;
@@ -223,7 +220,7 @@ public:
 
     double dragStartPositionY = 0.0;
     double dragStartPositionX = 0.0;
-    MidiNote* selectedNote = nullptr;
+    Step* selectedNote = nullptr;
     void mouseDown(const juce::MouseEvent& event) override
     {
         dragStartPositionY = event.position.y;
@@ -231,7 +228,7 @@ public:
         selectedNote = getMidiNoteAtPosition(dragStartPositionX, dragStartPositionY);
         if (selectedNote != nullptr) {
             if (event.mods.isRightButtonDown()) {
-                midiNotes.remove(selectedNote);
+                steps.remove(selectedNote);
                 repaint();
             } else {
                 showToolbox();
@@ -246,7 +243,7 @@ public:
         if (getMidiNoteAtPosition(event.position.x, event.position.y) == nullptr) {
             int clickedStep = event.position.x / stepWidth;
             int clickedPitch = getMidiRangeStart() + (numNotes - (event.position.y - headerHeight) / noteHeight);
-            midiNotes.add({ clickedStep, clickedPitch, 4 });
+            steps.add({ clickedStep, clickedPitch, 4 });
             repaint();
         }
     }
@@ -288,7 +285,7 @@ public:
         int stepWidth = getWidth() / numSteps;
         int noteHeight = (getHeight() - headerHeight) / numNotes;
 
-        MidiNote* note = getMidiNoteAtPosition(event.x, event.y);
+        Step* note = getMidiNoteAtPosition(event.x, event.y);
         if (note != nullptr) {
             int delta = (wheel.deltaY > 0) ? 1 : -1;
             note->length = juce::jmax(1, note->length + delta);
@@ -305,10 +302,10 @@ public:
     // if no note has been edited, then add a new note after the last note
     // if there is no note at all then add a new note at the beginning in middle screeen..
 
-    MidiNote* getMidiNoteAtPosition(double eventX, double eventY)
+    Step* getMidiNoteAtPosition(double eventX, double eventY)
     {
         int midiRangeStart = getMidiRangeStart();
-        for (auto& note : midiNotes) {
+        for (auto& note : steps) {
             int y = headerHeight + (numNotes - (note.pitch - midiRangeStart) - 1) * noteHeight;
             // If mouse is over a note, change length instead of scrolling
             if (eventY >= y && eventY < y + noteHeight && eventX >= note.startStep * stepWidth && eventX < (note.startStep + note.length) * stepWidth) {

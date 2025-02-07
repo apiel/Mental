@@ -52,11 +52,12 @@ public:
     void resized() override
     {
         auto area = getLocalBounds().reduced(5);
-        pitchLabel.setBounds(area.removeFromTop(20));
-        pitchSlider.setBounds(area.removeFromTop(30));
-        lengthLabel.setBounds(area.removeFromTop(20));
-        lengthSlider.setBounds(area.removeFromTop(30));
-        deleteButton.setBounds(area.removeFromTop(30));
+        auto itemWidth = area.getWidth() / 5;
+        pitchLabel.setBounds(area.removeFromLeft(itemWidth).reduced(2));
+        pitchSlider.setBounds(area.removeFromLeft(itemWidth).reduced(2));
+        lengthLabel.setBounds(area.removeFromLeft(itemWidth).reduced(2));
+        lengthSlider.setBounds(area.removeFromLeft(itemWidth).reduced(2));
+        deleteButton.setBounds(area.removeFromLeft(itemWidth).reduced(2));
     }
 
 private:
