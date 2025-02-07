@@ -35,31 +35,31 @@ private:
 
 class NoteToolboxComponent : public juce::Component {
 private:
-    juce::Label pitchLabel, lengthLabel;
-    juce::Slider pitchSlider;
+    juce::Label velocityLabel, lengthLabel;
+    juce::Slider velocitySlider;
     ScrollableComboBox lengthSelector;
     juce::DrawableButton deleteButton { "Delete", juce::DrawableButton::ImageFitted };
 
 public:
-    std::function<void(int)> onPitchChange;
+    std::function<void(float)> onVelocityChange;
     std::function<void(int)> onLengthChange;
     std::function<void()> onDelete;
 
     NoteToolboxComponent()
     {
-        addAndMakeVisible(pitchLabel);
-        addAndMakeVisible(pitchSlider);
+        addAndMakeVisible(velocityLabel);
+        addAndMakeVisible(velocitySlider);
         addAndMakeVisible(lengthLabel);
         addAndMakeVisible(lengthSelector);
         addAndMakeVisible(deleteButton);
 
-        pitchLabel.setText("Pitch:", juce::dontSendNotification);
+        velocityLabel.setText("Velocity:", juce::dontSendNotification);
         lengthLabel.setText("Length:", juce::dontSendNotification);
 
-        pitchSlider.setRange(0, 127, 1);
-        pitchSlider.onValueChange = [this] {
-            if (onPitchChange)
-                onPitchChange((int)pitchSlider.getValue());
+        velocitySlider.setRange(0.0, 1.0, 0.05);
+        velocitySlider.onValueChange = [this] {
+            if (onVelocityChange)
+                onVelocityChange(velocitySlider.getValue());
         };
 
         for (int i = 1; i <= 64; ++i)
@@ -121,9 +121,9 @@ public:
         icon->setPath(path);
     }
 
-    void setNoteDetails(int pitch, int length)
+    void setNoteDetails(float velocity, int length)
     {
-        pitchSlider.setValue(pitch, juce::dontSendNotification);
+        velocitySlider.setValue(velocity, juce::dontSendNotification);
         lengthSelector.setSelectedId(length, juce::dontSendNotification);
     }
 
@@ -139,8 +139,8 @@ public:
     // Adjust widths dynamically based on component sizes
     auto labelWidth = 50;  // Fixed width for labels
 
-    pitchLabel.setBounds(area.removeFromLeft(labelWidth).reduced(2));
-    pitchSlider.setBounds(area.removeFromLeft(200).reduced(2));
+    velocityLabel.setBounds(area.removeFromLeft(labelWidth).reduced(2));
+    velocitySlider.setBounds(area.removeFromLeft(200).reduced(2));
     lengthLabel.setBounds(area.removeFromLeft(labelWidth).reduced(2));
     lengthSelector.setBounds(area.removeFromLeft(200).reduced(2));
     deleteButton.setBounds(area.removeFromLeft(100).reduced(2));

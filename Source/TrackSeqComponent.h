@@ -31,16 +31,18 @@ protected:
             addAndMakeVisible(toolbox.get());
         }
 
-        toolbox->setNoteDetails(selectedNote->pitch, selectedNote->length);
-        toolbox->onPitchChange = [this](int newPitch) {
-            if (selectedNote)
-                selectedNote->pitch = newPitch;
-            repaint();
+        toolbox->setNoteDetails(selectedNote->velocity, selectedNote->length);
+        toolbox->onVelocityChange = [this](float newVelocity) {
+            if (selectedNote) {
+                selectedNote->velocity = newVelocity;
+                repaint();
+            }
         };
         toolbox->onLengthChange = [this](int newLength) {
-            if (selectedNote)
+            if (selectedNote) {
                 selectedNote->length = newLength;
-            repaint();
+                repaint();
+            }
         };
         toolbox->onDelete = [this]() {
             if (selectedNote) {
