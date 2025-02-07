@@ -188,6 +188,10 @@ public:
         dragStartPositionY = event.position.y;
         dragStartPositionX = event.position.x;
         dragNote = getMidiNoteAtPosition(dragStartPositionX, dragStartPositionY);
+        if (dragNote != nullptr && event.mods.isRightButtonDown()) {
+            midiNotes.remove(dragNote);
+            repaint();
+        }
     }
     void mouseDrag(const juce::MouseEvent& event) override
     {
