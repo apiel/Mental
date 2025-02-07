@@ -1,7 +1,9 @@
 #pragma once
 
-#include "constants.h"
 #include <JuceHeader.h>
+
+#include "NoteToolboxComponent.h"
+#include "constants.h"
 
 class TrackSeqComponent : public juce::Component, public juce::ScrollBar::Listener {
 protected:
@@ -24,6 +26,44 @@ protected:
     int getMidiRangeStart()
     {
         return (120 - 24) - verticalScrollbar.getCurrentRangeStart();
+    }
+
+    std::unique_ptr<NoteToolboxComponent> toolbox;
+    void showToolbox()
+    {
+        if (!toolbox) {
+            toolbox = std::make_unique<NoteToolboxComponent>();
+            addAndMakeVisible(toolbox.get());
+        }
+
+        toolbox->setNoteDetails(selectedNote->pitch, selectedNote->length);
+        toolbox->onPitchChange = [this](int newPitch) {
+            if (selectedNote)
+                selectedNote->pitch = newPitch;
+            repaint();
+        };
+        toolbox->onLengthChange = [this](int newLength) {
+            if (selectedNote)
+                selectedNote->length = newLength;
+            repaint();
+        };
+        toolbox->onDelete = [this]() {
+            if (selectedNote) {
+                midiNotes.remove(selectedNote);
+                selectedNote = nullptr;
+                toolbox.reset();
+                repaint();
+            }
+        };
+
+        updateToolboxBounds();
+    }
+
+    void updateToolboxBounds()
+    {
+        int toolboxWidth = 180;
+        int toolboxHeight = 120;
+        toolbox->setBounds(getWidth() - toolboxWidth - 20, getHeight() - toolboxHeight - 20, toolboxWidth, toolboxHeight);
     }
 
 public:
@@ -165,6 +205,7 @@ public:
         stepWidth = getWidth() / numSteps;
 
         verticalScrollbar.setBounds(getWidth() - 10, headerHeight, 10, getHeight() - headerHeight);
+        updateToolboxBounds();
     }
 
     void scrollBarMoved(juce::ScrollBar* scrollbar, double newRangeStart) override
@@ -182,42 +223,59 @@ public:
 
     double dragStartPositionY = 0.0;
     double dragStartPositionX = 0.0;
-    MidiNote* dragNote = nullptr;
+    MidiNote* selectedNote = nullptr;
     void mouseDown(const juce::MouseEvent& event) override
     {
         dragStartPositionY = event.position.y;
         dragStartPositionX = event.position.x;
-        dragNote = getMidiNoteAtPosition(dragStartPositionX, dragStartPositionY);
-        if (dragNote != nullptr && event.mods.isRightButtonDown()) {
-            midiNotes.remove(dragNote);
+        selectedNote = getMidiNoteAtPosition(dragStartPositionX, dragStartPositionY);
+        if (selectedNote != nullptr) {
+            if (event.mods.isRightButtonDown()) {
+                midiNotes.remove(selectedNote);
+                repaint();
+            } else {
+                showToolbox();
+            }
+        } else {
+            toolbox.reset();
+        }
+    }
+
+    void mouseDoubleClick(const juce::MouseEvent& event) override
+    {
+        if (getMidiNoteAtPosition(event.position.x, event.position.y) == nullptr) {
+            int clickedStep = event.position.x / stepWidth;
+            int clickedPitch = getMidiRangeStart() + (numNotes - (event.position.y - headerHeight) / noteHeight);
+            midiNotes.add({ clickedStep, clickedPitch, 4 });
             repaint();
         }
     }
+
     void mouseDrag(const juce::MouseEvent& event) override
     {
         if (event.mods.isMiddleButtonDown()) {
             double deltaY = (event.position.y - dragStartPositionY) / 24;
             verticalScrollbar.setCurrentRangeStart(verticalScrollbar.getCurrentRangeStart() - deltaY);
             dragStartPositionY = event.position.y;
-        } else if (dragNote != nullptr && event.mods.isLeftButtonDown()) {
+        } else if (selectedNote != nullptr && event.mods.isLeftButtonDown()) {
             double deltaY = (event.position.y - dragStartPositionY);
             if (deltaY >= noteHeight) {
-                dragNote->pitch -= (int)(deltaY / noteHeight);
+                selectedNote->pitch -= (int)(deltaY / noteHeight);
                 repaint();
                 dragStartPositionY = event.position.y;
             } else if (-deltaY >= noteHeight) {
-                dragNote->pitch += (int)((-deltaY) / noteHeight);
+                selectedNote->pitch += (int)((-deltaY) / noteHeight);
                 repaint();
                 dragStartPositionY = event.position.y;
             }
 
             double deltaX = (event.position.x - dragStartPositionX);
             if (deltaX >= stepWidth) {
-                dragNote->startStep += (int)(deltaX / stepWidth);
+                selectedNote->startStep += (int)(deltaX / stepWidth);
                 repaint();
                 dragStartPositionX = event.position.x;
             } else if (-deltaX >= stepWidth) {
-                dragNote->startStep -= (int)((-deltaX) / stepWidth);
+                selectedNote->startStep -= (int)((-deltaX) / stepWidth);
                 repaint();
                 dragStartPositionX = event.position.x;
             }
@@ -242,6 +300,10 @@ public:
         verticalScrollbar.setCurrentRangeStart(verticalScrollbar.getCurrentRangeStart() - wheel.deltaY * 6);
         repaint();
     }
+
+    // TODO when key A is pressed, add a new note after the last edited/move note
+    // if no note has been edited, then add a new note after the last note
+    // if there is no note at all then add a new note at the beginning in middle screeen..
 
     MidiNote* getMidiNoteAtPosition(double eventX, double eventY)
     {
