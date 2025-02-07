@@ -206,6 +206,17 @@ public:
                 repaint();
                 dragStartPositionY = event.position.y;
             }
+
+            double deltaX = (event.position.x - dragStartPositionX);
+            if (deltaX >= stepWidth) {
+                dragNote->startStep += (int)(deltaX / stepWidth);
+                repaint();
+                dragStartPositionX = event.position.x;
+            } else if (-deltaX >= stepWidth) {
+                dragNote->startStep -= (int)((-deltaX) / stepWidth);
+                repaint();
+                dragStartPositionX = event.position.x;
+            }
         }
     }
 
