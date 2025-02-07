@@ -189,8 +189,13 @@ public:
                 int width = step.length * stepWidth;
                 int height = stepHeight;
 
-                g.setColour(color);
+                g.setColour(color.darker(1.0f - step.velocity));
                 g.fillRect(x, y, width, height);
+
+                if (selectedNote == &step) {
+                    g.setColour(juce::Colours::white);
+                    g.drawRect(x, y, width, height);
+                }
 
                 g.setColour(juce::Colours::white);
                 g.drawText(juce::MidiMessage::getMidiNoteName(step.pitch, true, true, 4), x + (step.length == 1 ? 0 : 2), y, width, stepHeight, juce::Justification::centredLeft);
@@ -238,6 +243,7 @@ public:
         } else {
             toolbox.reset();
         }
+        repaint();
     }
 
     void mouseDoubleClick(const juce::MouseEvent& event) override

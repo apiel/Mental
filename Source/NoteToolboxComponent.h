@@ -137,13 +137,13 @@ public:
     auto area = getLocalBounds().reduced(5);
     
     // Adjust widths dynamically based on component sizes
-    auto labelWidth = 50;  // Fixed width for labels
+    auto labelWidth = 60;  // Fixed width for labels
 
     velocityLabel.setBounds(area.removeFromLeft(labelWidth).reduced(2));
     velocitySlider.setBounds(area.removeFromLeft(200).reduced(2));
     lengthLabel.setBounds(area.removeFromLeft(labelWidth).reduced(2));
     lengthSelector.setBounds(area.removeFromLeft(200).reduced(2));
-    deleteButton.setBounds(area.removeFromLeft(100).reduced(2));
+    deleteButton.setBounds(area.removeFromLeft(80).reduced(2));
 }
 
 };
