@@ -182,10 +182,12 @@ public:
 
     double dragStartPositionY = 0.0;
     double dragStartPositionX = 0.0;
+    MidiNote* dragNote = nullptr;
     void mouseDown(const juce::MouseEvent& event) override
     {
         dragStartPositionY = event.position.y;
         dragStartPositionX = event.position.x;
+        dragNote = getMidiNoteAtPosition(dragStartPositionX, dragStartPositionY);
     }
     void mouseDrag(const juce::MouseEvent& event) override
     {
@@ -193,22 +195,16 @@ public:
             double deltaY = (event.position.y - dragStartPositionY) / 24;
             verticalScrollbar.setCurrentRangeStart(verticalScrollbar.getCurrentRangeStart() - deltaY);
             dragStartPositionY = event.position.y;
-        } else if (event.mods.isLeftButtonDown()) {
+        } else if (dragNote != nullptr && event.mods.isLeftButtonDown()) {
             double deltaY = (event.position.y - dragStartPositionY);
             if (deltaY >= noteHeight) {
-                MidiNote* note = getMidiNoteAtPosition(dragStartPositionX, dragStartPositionY);
-                if (note != nullptr) {
-                    note->pitch -= 1;
-                    repaint();
-                    dragStartPositionY = event.position.y;
-                }
+                dragNote->pitch -= (int)(deltaY / noteHeight);
+                repaint();
+                dragStartPositionY = event.position.y;
             } else if (-deltaY >= noteHeight) {
-                MidiNote* note = getMidiNoteAtPosition(dragStartPositionX, dragStartPositionY);
-                if (note != nullptr) {
-                    note->pitch += 1;
-                    repaint();
-                    dragStartPositionY = event.position.y;
-                }
+                dragNote->pitch += (int)((-deltaY) / noteHeight);
+                repaint();
+                dragStartPositionY = event.position.y;
             }
         }
     }
