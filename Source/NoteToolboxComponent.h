@@ -34,6 +34,16 @@ private:
     CustomLookAndFeel customLookAndFeel;
 };
 
+class CustomSliderLookAndFeel : public juce::LookAndFeel_V4 {
+public:
+    void drawLabel(juce::Graphics& g, juce::Label& label) override
+    {
+        g.setColour(label.findColour(juce::Label::textColourId));
+        g.setFont(label.getFont());
+        g.drawFittedText(label.getText(), label.getLocalBounds(), juce::Justification::centred, 1);
+    }
+};
+
 class NoteToolboxComponent : public juce::Component {
 private:
     juce::Label velocityLabel, lengthLabel, conditionLabel, motionLabel;
@@ -41,12 +51,19 @@ private:
     ScrollableComboBox lengthSelector, conditionSelector, motionSelector;
     juce::DrawableButton deleteButton { "Delete", juce::DrawableButton::ImageFitted };
 
+    CustomSliderLookAndFeel customLookAndFeel;
+
 public:
     std::function<void(float)> onVelocityChange;
     std::function<void(int)> onLengthChange;
     std::function<void(int)> onConditionChange;
     std::function<void(int)> onMotionChange;
     std::function<void()> onDelete;
+
+    ~NoteToolboxComponent()
+    {
+        velocitySlider.setLookAndFeel(nullptr);
+    }
 
     NoteToolboxComponent()
     {
@@ -70,6 +87,10 @@ public:
             if (onVelocityChange)
                 onVelocityChange(velocitySlider.getValue());
         };
+        // velocitySlider.setLookAndFeel(&customLookAndFeel);
+        // velocitySlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+        velocitySlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 40, 14);
+        velocitySlider.setLookAndFeel(&customLookAndFeel);
 
         for (int i = 1; i <= 64; ++i) {
             lengthSelector.addItem(juce::String(i), i);
@@ -81,20 +102,20 @@ public:
         lengthSelector.setSelectedId(4, juce::dontSendNotification);
 
         for (int i = 0; i < STEP_CONDITIONS_COUNT; ++i) {
-            conditionSelector.addItem(stepConditions[i].name, i+1);
+            conditionSelector.addItem(stepConditions[i].name, i + 1);
         }
         conditionSelector.onChange = [this] {
             if (onConditionChange)
-                onConditionChange(conditionSelector.getSelectedId()-1);
+                onConditionChange(conditionSelector.getSelectedId() - 1);
         };
         conditionSelector.setSelectedId(0, juce::dontSendNotification);
 
         for (int i = 0; i < STEP_MOTIONS_COUNT; ++i) {
-            motionSelector.addItem(stepMotions[i].name, i+1);
+            motionSelector.addItem(stepMotions[i].name, i + 1);
         }
         motionSelector.onChange = [this] {
             if (onMotionChange)
-                onMotionChange(motionSelector.getSelectedId()-1);
+                onMotionChange(motionSelector.getSelectedId() - 1);
         };
         motionSelector.setSelectedId(0, juce::dontSendNotification);
 
@@ -150,8 +171,8 @@ public:
     {
         velocitySlider.setValue(velocity, juce::dontSendNotification);
         lengthSelector.setSelectedId(length, juce::dontSendNotification);
-        conditionSelector.setSelectedId(condition+1, juce::dontSendNotification);
-        motionSelector.setSelectedId(motion+1, juce::dontSendNotification);
+        conditionSelector.setSelectedId(condition + 1, juce::dontSendNotification);
+        motionSelector.setSelectedId(motion + 1, juce::dontSendNotification);
     }
 
     void paint(juce::Graphics& g) override
@@ -165,7 +186,10 @@ public:
         auto labelWidth = 70;
 
         velocityLabel.setBounds(area.removeFromLeft(labelWidth).reduced(2));
-        velocitySlider.setBounds(area.removeFromLeft(120).reduced(2));
+        // velocitySlider.setBounds(area.removeFromLeft(120).reduced(2));
+        auto sliderArea = area.removeFromLeft(120).reduced(2);
+        velocitySlider.setBounds(sliderArea.removeFromBottom(30));
+
         lengthLabel.setBounds(area.removeFromLeft(labelWidth).reduced(2));
         lengthSelector.setBounds(area.removeFromLeft(100).reduced(2));
         conditionLabel.setBounds(area.removeFromLeft(labelWidth).reduced(2));
