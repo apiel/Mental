@@ -2,20 +2,20 @@
 
 #include <JuceHeader.h>
 
-class ClockListener {
+class TrackListener {
 public:
     virtual void onMidiClockTick(int clockCounter, bool isQuarterNote) = 0;
 };
 
-class ClockEmitter {
+class TrackEmitter {
 private:
-    juce::ListenerList<ClockListener> listeners;
+    juce::ListenerList<TrackListener> listeners;
     int clockCounter = 0;
 
 public:
-    static ClockEmitter& get()
+    static TrackEmitter& get()
     {
-        static ClockEmitter instance;
+        static TrackEmitter instance;
         return instance;
     }
 
@@ -25,10 +25,10 @@ public:
         // Clock events are sent at a rate of 24 pulses per quarter note
         // (24/4 = 6)
         bool isQuarterNote = clockCounter % 6 == 0;
-        listeners.call([this, isQuarterNote](ClockListener& l) { 
+        listeners.call([this, isQuarterNote](TrackListener& l) { 
             l.onMidiClockTick(clockCounter, isQuarterNote);
         });
     }
 
-    void subscribe(ClockListener* listener) { listeners.add(listener); }
+    void subscribe(TrackListener* listener) { listeners.add(listener); }
 };

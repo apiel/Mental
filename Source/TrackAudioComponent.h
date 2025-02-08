@@ -5,15 +5,19 @@
 // #define JUCE_PLUGINHOST_VST 1
 #define JUCE_PLUGINHOST_LV2 1
 
+#include "TrackListener.h"
 #include <JuceHeader.h>
-#include "ClockListener.h"
 
-class TrackAudioComponent : public juce::AudioAppComponent, public ClockListener {
+class TrackAudioComponent : public juce::AudioAppComponent, public TrackListener {
+private:
+    juce::Array<Step>& steps;
+
 public:
-    TrackAudioComponent()
+    TrackAudioComponent(juce::Array<Step>& stepsRef)
+        : steps(stepsRef)
     {
         setAudioChannels(0, 2);
-        ClockEmitter::get().subscribe(this);
+        TrackEmitter::get().subscribe(this);
     }
 
     ~TrackAudioComponent() override

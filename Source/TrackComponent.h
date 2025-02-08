@@ -41,6 +41,7 @@ public:
     TrackComponent(juce::Colour color)
         : juce::TabbedComponent(juce::TabbedButtonBar::TabsAtTop)
         , color(color)
+        , audioComponent(steps)
         , seqComponent(color, steps)
     {
         // Example MIDI Notes (Step, Pitch, Length)

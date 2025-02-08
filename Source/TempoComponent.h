@@ -1,7 +1,7 @@
 #pragma once
 
 #include "KnobLookAndFeel.h"
-#include "ClockListener.h"
+#include "TrackListener.h"
 #include <JuceHeader.h>
 
 class TempoComponent : public juce::AudioAppComponent {
@@ -14,7 +14,7 @@ private:
     int sampleCountTarget = 0;
     int sampleCounter = 0;
 
-    ClockEmitter& clockEmitter = ClockEmitter::get();
+    TrackEmitter& trackEmitter = TrackEmitter::get();
 
     void updateTempo()
     {
@@ -75,7 +75,7 @@ public:
         sampleCounter += bufferToFill.numSamples;
 
         while (sampleCounter >= sampleCountTarget) {
-            clockEmitter.sendClockTick();
+            trackEmitter.sendClockTick();
             sampleCounter -= sampleCountTarget;
         }
 
