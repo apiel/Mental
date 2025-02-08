@@ -31,7 +31,7 @@ protected:
             addAndMakeVisible(toolbox.get());
         }
 
-        toolbox->setNoteDetails(selectedNote->velocity, selectedNote->length);
+        toolbox->setNoteDetails(selectedNote->velocity, selectedNote->length, selectedNote->condition, selectedNote->motion);
         toolbox->onVelocityChange = [this](float newVelocity) {
             if (selectedNote) {
                 selectedNote->velocity = newVelocity;
@@ -56,7 +56,7 @@ protected:
         updateToolboxBounds();
     }
 
-    int toolboxWidth = 600;
+    int toolboxWidth = 780;
     int toolboxHeight = 60;
     void updateToolboxBounds()
     {
