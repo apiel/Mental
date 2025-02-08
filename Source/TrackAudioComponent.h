@@ -42,16 +42,16 @@ private:
                     step.counter--;
                     if (step.counter == 0) {
                         // note off
-                        noteOff(step.pitch, sampleNum);
-                        printf("noteoff Step %i: %i\n", stepCounter, step.pitch);
+                        // noteOff(step.pitch, sampleNum);
+                        printf("noteoff Step %i: %i\n", step.startStep, step.pitch);
                     }
                 }
                 // here might want to check for state == Status::ON
                 if (stepCounter == step.startStep && conditionMet(step) && step.velocity > 0.0f) {
                     step.counter = step.length;
                     // note on
-                    noteOn(step.pitch, step.velocity, sampleNum);
-                    printf("noteon Step %i: %i\n", stepCounter, step.pitch);
+                    // noteOn(step.pitch, step.velocity, sampleNum);
+                    printf("noteon Step %i: %i\n", step.startStep, step.pitch);
                 }
             }
         }
@@ -61,6 +61,7 @@ public:
     TrackAudioComponent(juce::Array<Step>& stepsRef)
         : steps(stepsRef)
     {
+        setWantsKeyboardFocus(true);
         setAudioChannels(0, 2);
         TrackEmitter::get().subscribe(this);
     }
@@ -103,11 +104,27 @@ public:
 
     void onMidiClockTick(int clockCounter, bool isQuarterNote, int sampleNum) override
     {
-        if (isQuarterNote)
-        {
+        midiBuffer.addEvent(juce::MidiMessage::midiClock(), sampleNum);
+        if (isQuarterNote) {
             onStep(sampleNum);
         }
-        
+    }
+
+    bool wasSpacePressed = false;
+    bool keyStateChanged(bool isKeyDown) override
+    {
+        bool spaceIsDown = juce::KeyPress::isKeyCurrentlyDown(juce::KeyPress::spaceKey);
+
+        if (spaceIsDown && !wasSpacePressed) // Space pressed for the first time
+        {
+            wasSpacePressed = true;
+            noteOn(60, 1.0, 0);
+        } else if (!spaceIsDown && wasSpacePressed) // Space released
+        {
+            wasSpacePressed = false;
+            noteOff(60, 1);
+        }
+        return true;
     }
 
     void paint(juce::Graphics& g) override

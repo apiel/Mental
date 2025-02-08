@@ -38,12 +38,27 @@ public:
             setResizable(true, true);
             setVisible(true);
             centreWithSize(getWidth(), getHeight()); // might change this...
+
+            // setBufferSize();
         }
 
         void closeButtonPressed() override
         {
             JUCEApplication::getInstance()->systemRequestedQuit();
         }
+
+        // Does seems to work as expected
+        // void setBufferSize()
+        // {
+        //     juce::AudioDeviceManager audioDeviceManager;
+        //     juce::AudioDeviceManager::AudioDeviceSetup setup;
+        //     audioDeviceManager.getAudioDeviceSetup(setup);
+
+        //     setup.bufferSize = 128; // Set preferred buffer size
+        //     audioDeviceManager.setAudioDeviceSetup(setup, true);
+
+        //     DBG("Global Audio Block Size: " << setup.bufferSize);
+        // }
 
     private:
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainWindow)
