@@ -1,6 +1,7 @@
 #pragma once
 
 #include "KnobLookAndFeel.h"
+#include "ClockListener.h"
 #include <JuceHeader.h>
 
 class TempoComponent : public juce::AudioAppComponent {
@@ -12,6 +13,8 @@ private:
     double bpm = 160.0;
     int sampleCountTarget = 0;
     int sampleCounter = 0;
+
+    ClockEmitter& clockEmitter = ClockEmitter::get();
 
     void updateTempo()
     {
@@ -72,18 +75,11 @@ public:
         sampleCounter += bufferToFill.numSamples;
 
         while (sampleCounter >= sampleCountTarget) {
-            sendClockTick();
+            clockEmitter.sendClockTick();
             sampleCounter -= sampleCountTarget;
         }
 
         bufferToFill.clearActiveBufferRegion();
-    }
-
-    void sendClockTick()
-    {
-        // DBG("MIDI Clock Tick Sent!");
-        // Here you can send a MIDI Clock message if needed
-        // Example: midiBuffer.addEvent(juce::MidiMessage::midiClock(), 0);
     }
 
 private:
