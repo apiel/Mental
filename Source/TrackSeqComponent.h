@@ -226,7 +226,7 @@ public:
         dragStartPositionX = event.position.x;
         selectedNote = getMidiNoteAtPosition(dragStartPositionX, dragStartPositionY);
         if (selectedNote != nullptr) {
-            if (event.mods.isRightButtonDown()) {
+            if (event.mods.isRightButtonDown() || event.mods.isMiddleButtonDown()) {
                 steps.remove(selectedNote);
                 repaint();
             } else {
