@@ -20,7 +20,7 @@ private:
 
 public:
     TempoComponent()
-        : customLookAndFeel({ juce::Colours::palevioletred })
+        : customLookAndFeel({ juce::Colours::palevioletred, " BPM" })
     {
         setAudioChannels(0, 2);
 

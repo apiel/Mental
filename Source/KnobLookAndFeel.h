@@ -33,9 +33,10 @@ public:
         auto angle = rotaryStartAngle + sliderPos * (rotaryEndAngle - rotaryStartAngle);
 
         // Draw background circle
-        g.setColour(juce::Colours::grey.withBrightness(0.3f));
-        g.fillEllipse(centerX - radius, centerY - radius, radius * 2.0f, radius * 2.0f);
-        g.setColour(juce::Colours::grey);
+        // g.setColour(juce::Colours::grey.withBrightness(0.3f));
+        // g.fillEllipse(centerX - radius, centerY - radius, radius * 2.0f, radius * 2.0f);
+        // g.setColour(juce::Colours::grey);
+        g.setColour(colour.withAlpha(0.3f));
         juce::Path arcBg;
         arcBg.addArc(centerX - radius, centerY - radius, radius * 2.0f, radius * 2.0f,
             rotaryStartAngle, rotaryEndAngle, true);
@@ -45,7 +46,7 @@ public:
         juce::Path arc;
         arc.addArc(centerX - radius, centerY - radius, radius * 2.0f, radius * 2.0f,
             rotaryStartAngle, angle, true);
-        g.strokePath(arc, juce::PathStrokeType(6.0f));
+        g.strokePath(arc, juce::PathStrokeType(8.0f));
     }
 
     void drawLabel(juce::Graphics& g, juce::Label& label) override
