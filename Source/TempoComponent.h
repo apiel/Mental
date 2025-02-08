@@ -10,12 +10,17 @@ private:
     double sampleRate = 0.0;
     int samplesPerBlockExpected = 0;
     double bpm = 160.0;
+    int sampleCountTarget = 0;
+    int sampleCounter = 0;
 
     void updateTempo()
     {
         bpm = tempoKnob.getValue();
+        if (bpm > 0.0) {
+            sampleCountTarget = static_cast<int>((sampleRate * 60.0f / bpm) / 12.0f);
+        }
         // Here you can send a notification to update timing in other components
-        DBG("Tempo changed to: " << bpm << " BPM");
+        DBG("Tempo changed to: " << bpm << " BPM (" << sampleCountTarget << " samples per block)");
     }
 
 public:
@@ -58,12 +63,27 @@ public:
     {
         this->samplesPerBlockExpected = samplesPerBlockExpected;
         this->sampleRate = sampleRate;
+        sampleCounter = 0;
         updateTempo();
     }
 
     void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) override
     {
-        bufferToFill.clearActiveBufferRegion(); // Silence the output
+        sampleCounter += bufferToFill.numSamples;
+
+        while (sampleCounter >= sampleCountTarget) {
+            sendClockTick();
+            sampleCounter -= sampleCountTarget;
+        }
+
+        bufferToFill.clearActiveBufferRegion();
+    }
+
+    void sendClockTick()
+    {
+        // DBG("MIDI Clock Tick Sent!");
+        // Here you can send a MIDI Clock message if needed
+        // Example: midiBuffer.addEvent(juce::MidiMessage::midiClock(), 0);
     }
 
 private:
