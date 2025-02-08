@@ -71,27 +71,30 @@ public:
                 onVelocityChange(velocitySlider.getValue());
         };
 
-        for (int i = 1; i <= 64; ++i)
+        for (int i = 1; i <= 64; ++i) {
             lengthSelector.addItem(juce::String(i), i);
+        }
         lengthSelector.onChange = [this] {
             if (onLengthChange)
                 onLengthChange(lengthSelector.getSelectedId());
         };
         lengthSelector.setSelectedId(4, juce::dontSendNotification);
 
-        for (int i = 0; i < STEP_CONDITIONS_COUNT; ++i)
-            conditionSelector.addItem(stepConditions[i].name, i);
+        for (int i = 0; i < STEP_CONDITIONS_COUNT; ++i) {
+            conditionSelector.addItem(stepConditions[i].name, i+1);
+        }
         conditionSelector.onChange = [this] {
             if (onConditionChange)
-                onConditionChange(conditionSelector.getSelectedId());
+                onConditionChange(conditionSelector.getSelectedId()-1);
         };
         conditionSelector.setSelectedId(0, juce::dontSendNotification);
 
-        for (int i = 0; i < STEP_MOTIONS_COUNT; ++i)
-            motionSelector.addItem(stepMotions[i].name, i);
+        for (int i = 0; i < STEP_MOTIONS_COUNT; ++i) {
+            motionSelector.addItem(stepMotions[i].name, i+1);
+        }
         motionSelector.onChange = [this] {
             if (onMotionChange)
-                onMotionChange(motionSelector.getSelectedId());
+                onMotionChange(motionSelector.getSelectedId()-1);
         };
         motionSelector.setSelectedId(0, juce::dontSendNotification);
 
@@ -147,8 +150,8 @@ public:
     {
         velocitySlider.setValue(velocity, juce::dontSendNotification);
         lengthSelector.setSelectedId(length, juce::dontSendNotification);
-        conditionSelector.setSelectedId(condition, juce::dontSendNotification);
-        motionSelector.setSelectedId(motion, juce::dontSendNotification);
+        conditionSelector.setSelectedId(condition+1, juce::dontSendNotification);
+        motionSelector.setSelectedId(motion+1, juce::dontSendNotification);
     }
 
     void paint(juce::Graphics& g) override
