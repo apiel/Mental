@@ -4,7 +4,7 @@
 
 class ClockListener {
 public:
-    virtual void onMidiClockTick(bool isQuarterNote) = 0;
+    virtual void onMidiClockTick(int clockCounter, bool isQuarterNote) = 0;
 };
 
 class ClockEmitter {
@@ -25,7 +25,9 @@ public:
         // Clock events are sent at a rate of 24 pulses per quarter note
         // (24/4 = 6)
         bool isQuarterNote = clockCounter % 6 == 0;
-        listeners.call([isQuarterNote](ClockListener& l) { l.onMidiClockTick(isQuarterNote); });
+        listeners.call([this, isQuarterNote](ClockListener& l) { 
+            l.onMidiClockTick(clockCounter, isQuarterNote);
+        });
     }
 
     void subscribe(ClockListener* listener) { listeners.add(listener); }

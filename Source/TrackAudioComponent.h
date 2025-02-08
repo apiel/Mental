@@ -6,12 +6,14 @@
 #define JUCE_PLUGINHOST_LV2 1
 
 #include <JuceHeader.h>
+#include "ClockListener.h"
 
-class TrackAudioComponent : public juce::AudioAppComponent {
+class TrackAudioComponent : public juce::AudioAppComponent, public ClockListener {
 public:
     TrackAudioComponent()
     {
         setAudioChannels(0, 2);
+        ClockEmitter::get().subscribe(this);
     }
 
     ~TrackAudioComponent() override
@@ -36,6 +38,10 @@ public:
 
         deleteAllChildren();
         shutdownAudio();
+    }
+
+    void onMidiClockTick(int clockCounter, bool isQuarterNote)
+    {
     }
 
     void paint(juce::Graphics& g) override
