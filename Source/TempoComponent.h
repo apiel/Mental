@@ -13,6 +13,7 @@ private:
     double bpm = 160.0;
     int sampleCountTarget = 0;
     int sampleCounter = 0;
+    int sampleNum = 0; // Total sample count
 
     TrackEmitter& trackEmitter = TrackEmitter::get();
 
@@ -72,11 +73,30 @@ public:
 
     void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) override
     {
-        sampleCounter += bufferToFill.numSamples;
+        if (sampleCountTarget) {
+            // printf("block %d\n", sampleNum);
 
-        while (sampleCounter >= sampleCountTarget) {
-            trackEmitter.sendClockTick();
-            sampleCounter -= sampleCountTarget;
+            // sampleCounter += bufferToFill.numSamples;
+
+            // while (sampleCounter >= sampleCountTarget) {
+            //     trackEmitter.sendClockTick();
+            //     sampleCounter -= sampleCountTarget;
+            // }
+
+            int numSamples = bufferToFill.numSamples;
+
+            for (int sample = 0; sample < numSamples; ++sample) {
+                sampleCounter++;
+                sampleNum++;
+
+                if (sampleCounter >= sampleCountTarget) // Time to send a tick?
+                {
+                    // printf("tick %d\n", sampleNum);
+                    // trackEmitter.sendClockTick(sampleNum);
+                    trackEmitter.sendClockTick(sample);
+                    sampleCounter = 0; // Reset counter
+                }
+            }
         }
 
         bufferToFill.clearActiveBufferRegion();

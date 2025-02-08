@@ -34,7 +34,7 @@ public:
             setUsingNativeTitleBar(true);
             setContentOwned(new MainComponent(), true);
 
-            setFullScreen(true);
+            // setFullScreen(true);
             setResizable(true, true);
             setVisible(true);
             centreWithSize(getWidth(), getHeight()); // might change this...

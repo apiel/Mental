@@ -90,4 +90,5 @@ struct Step {
     float velocity = 1.0f;
     int condition = 0;
     int motion = 0;
+    uint8_t counter = 0;
 };

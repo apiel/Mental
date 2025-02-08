@@ -15,7 +15,7 @@ protected:
     juce::Array<Step>& steps;
     juce::ScrollBar verticalScrollbar { true };
     int viewOffsetY = 0;
-    int numSteps = 64;
+    int numSteps = MAX_STEPS;
     int numNotes = 36; // Now starting from C0 upwards
 
     int getMidiRangeStart()
@@ -72,8 +72,6 @@ public:
         : color(color)
         , steps(stepsRef)
     {
-        printf("TrackSeqComponent constructor step size %d\n", steps.size());
-
         addAndMakeVisible(verticalScrollbar);
         verticalScrollbar.setRangeLimits(12, 120); // C0 to C9 range
         verticalScrollbar.setCurrentRange(12, 12 + numNotes);
@@ -109,8 +107,6 @@ public:
 
     void paint(juce::Graphics& g) override
     {
-        printf("TrackSeqComponent paint step size %d\n", steps.size());
-
         g.fillAll(bgColour);
 
         int midiRangeStart = getMidiRangeStart();

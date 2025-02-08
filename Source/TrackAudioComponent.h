@@ -6,11 +6,56 @@
 #define JUCE_PLUGINHOST_LV2 1
 
 #include "TrackListener.h"
+#include "constants.h"
 #include <JuceHeader.h>
 
 class TrackAudioComponent : public juce::AudioAppComponent, public TrackListener {
 private:
     juce::Array<Step>& steps;
+
+    juce::MidiBuffer midiBuffer;
+    int stepCounter = 0;
+    bool isPlaying = false;
+    int loopCounter = 0;
+
+    bool conditionMet(Step& step)
+    {
+        return stepConditions[step.condition].conditionMet(loopCounter);
+    }
+
+    void onStep(int sampleNum)
+    {
+        stepCounter++;
+        // uint8_t state = status.get();
+        // If we reach the end of the sequence, we reset the step counter
+        if (stepCounter >= MAX_STEPS) {
+            stepCounter = 0;
+            loopCounter++;
+            // props.audioPluginHandler->sendEvent(AudioEventType::SEQ_LOOP, track);
+            // if (state == Status::NEXT) {
+            //     status.set(Status::ON);
+            // }
+        }
+        if (plugin_instance) {
+            for (auto& step : steps) {
+                if (step.counter) {
+                    step.counter--;
+                    if (step.counter == 0) {
+                        // note off
+                        noteOff(step.pitch, sampleNum);
+                        printf("noteoff Step %i: %i\n", stepCounter, step.pitch);
+                    }
+                }
+                // here might want to check for state == Status::ON
+                if (stepCounter == step.startStep && conditionMet(step) && step.velocity > 0.0f) {
+                    step.counter = step.length;
+                    // note on
+                    noteOn(step.pitch, step.velocity, sampleNum);
+                    printf("noteon Step %i: %i\n", stepCounter, step.pitch);
+                }
+            }
+        }
+    }
 
 public:
     TrackAudioComponent(juce::Array<Step>& stepsRef)
@@ -44,8 +89,25 @@ public:
         shutdownAudio();
     }
 
-    void onMidiClockTick(int clockCounter, bool isQuarterNote)
+    void noteOn(int midiNote, float velocity, int sampleOffset)
     {
+        juce::MidiMessage noteOn = juce::MidiMessage::noteOn(1, midiNote, velocity);
+        midiBuffer.addEvent(noteOn, sampleOffset);
+    }
+
+    void noteOff(int midiNote, int sampleOffset)
+    {
+        juce::MidiMessage noteOff = juce::MidiMessage::noteOff(1, midiNote);
+        midiBuffer.addEvent(noteOff, sampleOffset);
+    }
+
+    void onMidiClockTick(int clockCounter, bool isQuarterNote, int sampleNum) override
+    {
+        if (isQuarterNote)
+        {
+            onStep(sampleNum);
+        }
+        
     }
 
     void paint(juce::Graphics& g) override
@@ -106,8 +168,8 @@ public:
     void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) override
     {
         if (plugin_instance) {
-            juce::MidiBuffer midi; // Empty MIDI buffer
-            plugin_instance->processBlock(*bufferToFill.buffer, midi);
+            plugin_instance->processBlock(*bufferToFill.buffer, midiBuffer);
+            midiBuffer.clear();
         } else {
             bufferToFill.clearActiveBufferRegion();
         }
