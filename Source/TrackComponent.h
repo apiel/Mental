@@ -2,6 +2,7 @@
 
 #include <JuceHeader.h>
 
+#include "Step.h"
 #include "TrackAudioComponent.h"
 #include "TrackSeqComponent.h"
 #include "constants.h"
@@ -33,13 +34,28 @@ protected:
     TrackAudioComponent audioComponent;
     TrackSeqComponent seqComponent;
 
+    juce::Array<Step> steps;
+
 public:
     juce::Colour color;
     TrackComponent(juce::Colour color)
         : juce::TabbedComponent(juce::TabbedButtonBar::TabsAtTop)
         , color(color)
-        , seqComponent(color)
+        , seqComponent(color, steps)
     {
+        // Example MIDI Notes (Step, Pitch, Length)
+        steps.add({ 0, 60, 4 }); // C4 spanning 4 steps
+        steps.add({ 4, 62, 2 }); // D4 spanning 2 steps
+        steps.add({ 8, 64, 8 }); // E4 spanning 8 steps
+        steps.add({ 16, 67, 4 }); // G4 spanning 4 steps
+        steps.add({ 20, 69, 6 }); // A4 spanning 6 steps
+        steps.add({ 24, 72, 6 }); // C5 spanning 6 steps
+        steps.add({ 32, 75, 6 }); // D#5 spanning 6 steps
+        steps.add({ 40, 77, 6 }); // F5 spanning 6 steps
+        steps.add({ 48, 80, 6 }); // G#5 spanning 6 steps
+        steps.add({ 56, 83, 6 }); // B5 spanning 6 steps
+        seqComponent.initScrollPosition();
+
         setColour(TabbedComponent::backgroundColourId, sidebarColour);
         // setColour(TabbedComponent::outlineColourId, sidebarColour);
         setOutline(0);

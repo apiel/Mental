@@ -12,7 +12,7 @@ protected:
     int stepHeight = 0;
     int stepWidth = 0;
 
-    juce::Array<Step> steps;
+    juce::Array<Step>& steps;
     juce::ScrollBar verticalScrollbar { true };
     int viewOffsetY = 0;
     int numSteps = 64;
@@ -68,20 +68,11 @@ protected:
 public:
     juce::Colour color;
 
-    TrackSeqComponent(juce::Colour color)
+    TrackSeqComponent(juce::Colour color, juce::Array<Step>& stepsRef)
         : color(color)
+        , steps(stepsRef)
     {
-        // Example MIDI Notes (Step, Pitch, Length)
-        steps.add({ 0, 60, 4 }); // C4 spanning 4 steps
-        steps.add({ 4, 62, 2 }); // D4 spanning 2 steps
-        steps.add({ 8, 64, 8 }); // E4 spanning 8 steps
-        steps.add({ 16, 67, 4 }); // G4 spanning 4 steps
-        steps.add({ 20, 69, 6 }); // A4 spanning 6 steps
-        steps.add({ 24, 72, 6 }); // C5 spanning 6 steps
-        steps.add({ 32, 75, 6 }); // D#5 spanning 6 steps
-        steps.add({ 40, 77, 6 }); // F5 spanning 6 steps
-        steps.add({ 48, 80, 6 }); // G#5 spanning 6 steps
-        steps.add({ 56, 83, 6 }); // B5 spanning 6 steps
+        printf("TrackSeqComponent constructor step size %d\n", steps.size());
 
         addAndMakeVisible(verticalScrollbar);
         verticalScrollbar.setRangeLimits(12, 120); // C0 to C9 range
@@ -89,6 +80,11 @@ public:
         verticalScrollbar.setCurrentRangeStart(((120 - 12) / 2) + 12 - numNotes / 2);
         verticalScrollbar.setColour(juce::ScrollBar::thumbColourId, color);
 
+        verticalScrollbar.addListener(this);
+    }
+
+    void initScrollPosition()
+    {
         if (steps.size() > 0) {
             // Find min and max pitch from the MIDI steps
             int minPitch = 127; // Max possible MIDI pitch
@@ -109,12 +105,12 @@ public:
             int scrollStart = juce::jlimit(12, 120 - numNotes, midiCenter - numNotes / 2 - midiRange / 2);
             verticalScrollbar.setCurrentRangeStart(scrollStart);
         }
-
-        verticalScrollbar.addListener(this);
     }
 
     void paint(juce::Graphics& g) override
     {
+        printf("TrackSeqComponent paint step size %d\n", steps.size());
+
         g.fillAll(bgColour);
 
         int midiRangeStart = getMidiRangeStart();
