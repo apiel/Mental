@@ -1,7 +1,6 @@
 #pragma once
 
 #include "constants.h"
-#include "Audio.h"
 #include "AudioTrack.h"
 #include <JuceHeader.h>
 
@@ -11,8 +10,8 @@ private:
     std::unique_ptr<juce::AudioProcessorEditor> pluginEditor;
 
 public:
-    TrackPluginComponent(int trackId)
-        : audioTrack(Audio::get().getTrack(trackId))
+    TrackPluginComponent(AudioTrack& audioTrack)
+        : audioTrack(audioTrack)
     {
         setWantsKeyboardFocus(true);
     }

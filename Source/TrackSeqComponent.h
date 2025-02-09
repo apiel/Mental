@@ -4,10 +4,13 @@
 
 #include "NoteToolboxComponent.h"
 #include "Step.h"
+#include "AudioTrack.h"
 #include "constants.h"
 
 class TrackSeqComponent : public juce::Component, public juce::ScrollBar::Listener {
 protected:
+    AudioTrack& audioTrack;
+
     int headerHeight = 20;
     int stepHeight = 0;
     int stepWidth = 0;
@@ -68,15 +71,17 @@ protected:
 public:
     juce::Colour color;
 
-    TrackSeqComponent(juce::Colour color, juce::Array<Step>& stepsRef)
-        : color(color)
-        , steps(stepsRef)
+    TrackSeqComponent(AudioTrack& audioTrack, juce::Colour color)
+        : audioTrack(audioTrack)
+        , color(color)
+        , steps(audioTrack.steps)
     {
         addAndMakeVisible(verticalScrollbar);
         verticalScrollbar.setRangeLimits(12, 120); // C0 to C9 range
         verticalScrollbar.setCurrentRange(12, 12 + numNotes);
         verticalScrollbar.setCurrentRangeStart(((120 - 12) / 2) + 12 - numNotes / 2);
         verticalScrollbar.setColour(juce::ScrollBar::thumbColourId, color);
+        initScrollPosition();
 
         verticalScrollbar.addListener(this);
     }

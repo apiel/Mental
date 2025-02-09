@@ -18,8 +18,6 @@ private:
 
     juce::AudioPluginFormatManager pluginmanager;
 
-    juce::Array<Step> steps;
-
     juce::MidiBuffer midiBuffer;
     int stepCounter = 0;
     bool isPlaying = false;
@@ -66,6 +64,7 @@ private:
 
 public:
     std::unique_ptr<juce::AudioPluginInstance> plugin;
+    juce::Array<Step> steps;
 
     AudioTrack()
     {

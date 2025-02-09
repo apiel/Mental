@@ -5,6 +5,7 @@
 #include "MasterComponent.h"
 #include "TrackComponent.h"
 // #include "constants.h"
+#include "Audio.h"
 
 class ContainerComponent : public juce::TabbedComponent {
 protected:
@@ -16,8 +17,8 @@ protected:
 public:
     ContainerComponent()
         : juce::TabbedComponent(juce::TabbedButtonBar::TabsAtLeft)
-        , trackComponent1(juce::Colours::orange, 0)
-        // , trackComponent2(juce::Colours::green, 1)
+        , trackComponent1(juce::Colours::orange, Audio::get().getTrack(0))
+        // , trackComponent2(juce::Colours::green, Audio::get().getTrack(1))
     {
         // setColour(TabbedComponent::backgroundColourId, sidebarColour);
         // setColour(TabbedComponent::outlineColourId, sidebarColour);

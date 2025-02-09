@@ -5,6 +5,7 @@
 #include "Step.h"
 #include "TrackPluginComponent.h"
 #include "TrackSeqComponent.h"
+#include "AudioTrack.h"
 #include "constants.h"
 
 class TrackTabLookAndFeel : public juce::LookAndFeel_V4 {
@@ -34,40 +35,14 @@ protected:
     TrackPluginComponent audioComponent;
     TrackSeqComponent seqComponent;
 
-    juce::Array<Step> steps;
-
 public:
     juce::Colour color;
-    TrackComponent(juce::Colour color, int trackId)
+    TrackComponent(juce::Colour color, AudioTrack& audioTrack)
         : juce::TabbedComponent(juce::TabbedButtonBar::TabsAtTop)
         , color(color)
-        , audioComponent(trackId)
-        , seqComponent(color, steps)
+        , audioComponent(audioTrack)
+        , seqComponent(audioTrack, color)
     {
-        // Example MIDI Notes (Step, Pitch, Length)
-        // steps.add({ 0, 60, 4 }); // C4 spanning 4 steps
-        // steps.add({ 4, 62, 2 }); // D4 spanning 2 steps
-        // steps.add({ 8, 64, 8 }); // E4 spanning 8 steps
-        // steps.add({ 16, 67, 4 }); // G4 spanning 4 steps
-        // steps.add({ 20, 69, 6 }); // A4 spanning 6 steps
-        // steps.add({ 24, 72, 6 }); // C5 spanning 6 steps
-        // steps.add({ 32, 75, 6 }); // D#5 spanning 6 steps
-        // steps.add({ 40, 77, 6 }); // F5 spanning 6 steps
-        // steps.add({ 48, 80, 6 }); // G#5 spanning 6 steps
-        // steps.add({ 56, 83, 6 }); // B5 spanning 6 steps
-
-        // Another simple pattern
-        steps.add({ 0, 60, 1 });
-        steps.add({ 8, 60, 1 });
-        steps.add({ 16, 60, 1 });
-        steps.add({ 24, 60, 1 });
-        steps.add({ 32, 60, 1 });
-        steps.add({ 40, 60, 1 });
-        steps.add({ 48, 60, 1 });
-        steps.add({ 56, 60, 1 });
-
-        seqComponent.initScrollPosition();
-
         setColour(TabbedComponent::backgroundColourId, sidebarColour);
         // setColour(TabbedComponent::outlineColourId, sidebarColour);
         setOutline(0);
