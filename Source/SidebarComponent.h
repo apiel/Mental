@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "constants.h"
+#include "TrackComponent.h"
 
 class FlatButtonLookAndFeel : public juce::LookAndFeel_V4 {
 public:

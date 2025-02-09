@@ -38,6 +38,18 @@ public:
         return newTrack;
     }
 
+    void updateTabs()
+    {
+        for (int i = 0; i < trackComponents.size(); i++) {
+            updateTab(*trackComponents[i]);
+        }
+    }
+
+    void updateTab(TrackComponent& trackComponent) {
+        setTabBackgroundColour(trackComponent.tabId, trackComponent.color);
+        setTabName(trackComponent.tabId, trackComponent.name);
+    }
+
     TrackComponent& getTrack(int index)
     {
         jassert(index >= 0 && index < trackComponents.size());
