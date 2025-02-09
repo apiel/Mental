@@ -11,9 +11,6 @@
 
 #include <JuceHeader.h>
 
-#include "libs/nlohmann/json.hpp"
-using json = nlohmann::json;
-
 class AudioTrack : public juce::AudioSource, public TrackListener {
 private:
     double sampleRate = 0.0;
@@ -100,7 +97,6 @@ public:
 
     ~AudioTrack()
     {
-        save();
         if (plugin) {
             // plugin->suspendProcessing(true);
         }
@@ -171,23 +167,6 @@ public:
             }
         } else {
             std::cout << "no plugins found\n";
-        }
-    }
-
-    juce::File file = juce::File("track.json");
-    void save()
-    {
-        json stepArray;
-
-        for (const auto& step : steps) {
-            stepArray.push_back({ { "startStep", step.startStep },
-                { "pitch", step.pitch },
-                { "length", step.length } });
-        }
-
-        juce::FileOutputStream outputStream(file);
-        if (outputStream.openedOk()) {
-            outputStream.writeText(stepArray.dump(4), false, false, nullptr);
         }
     }
 
