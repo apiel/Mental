@@ -8,6 +8,7 @@
 
 #include "ContainerComponent.h"
 #include "SidebarComponent.h"
+#include "Audio.h"
 
 class MainComponent : public juce::Component {
 protected:
@@ -18,6 +19,7 @@ public:
     MainComponent()
         : sidebar(container)
     {
+        Audio::get();
         setSize(1200, 800);
         addAndMakeVisible(sidebar);
         addAndMakeVisible(container);

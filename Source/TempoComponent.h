@@ -1,55 +1,34 @@
 #pragma once
 
+#include "AudioTempo.h"
 #include "KnobLookAndFeel.h"
 #include "TrackListener.h"
 #include <JuceHeader.h>
 
-class TempoComponent : public juce::AudioAppComponent {
+class TempoComponent : public juce::Component {
 private:
     juce::Slider tempoKnob;
     KnobLookAndFeel customLookAndFeel;
-    double sampleRate = 0.0;
-    int samplesPerBlockExpected = 0;
-    double bpm = 160.0;
-    int sampleCountTarget = 0;
-    int sampleCounter = 0;
-    int sampleNum = 0; // Total sample count
-
-    TrackEmitter& trackEmitter = TrackEmitter::get();
-
-    void updateTempo()
-    {
-        bpm = tempoKnob.getValue();
-        if (bpm > 0.0) {
-            sampleCountTarget = static_cast<int>((sampleRate * 60.0f / bpm) / 12.0f);
-        }
-        // Here you can send a notification to update timing in other components
-        DBG("Tempo changed to: " << bpm << " BPM (" << sampleCountTarget << " samples per block)");
-    }
+    AudioTempo& audioTempo = AudioTempo::get();
 
 public:
     TempoComponent()
         : customLookAndFeel({ juce::Colours::palevioletred, " BPM" })
     {
-        setAudioChannels(0, 2);
-
         tempoKnob.setLookAndFeel(&customLookAndFeel);
         tempoKnob.setSliderStyle(juce::Slider::Rotary);
         tempoKnob.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 50, 20);
         tempoKnob.setRange(30.0, 300.0, 1.0); // Tempo range from 30 to 300 BPM
-        tempoKnob.setValue(160.0); // Default tempo
-        tempoKnob.onValueChange = [this] { updateTempo(); };
+        tempoKnob.setValue(audioTempo.getBpm()); // Default tempo
+        tempoKnob.onValueChange = [this] {
+            audioTempo.setBpm(tempoKnob.getValue());
+        };
         addAndMakeVisible(tempoKnob);
     }
 
     ~TempoComponent() override
     {
         tempoKnob.setLookAndFeel(nullptr);
-        shutdownAudio();
-    }
-
-    void releaseResources() override
-    {
     }
 
     void paint(juce::Graphics& g) override
@@ -61,45 +40,6 @@ public:
     {
         auto area = getLocalBounds().reduced(10);
         tempoKnob.setBounds(area.removeFromTop(100));
-    }
-
-    void prepareToPlay(int samplesPerBlockExpected, double sampleRate) override
-    {
-        this->samplesPerBlockExpected = samplesPerBlockExpected;
-        this->sampleRate = sampleRate;
-        sampleCounter = 0;
-        updateTempo();
-    }
-
-    void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) override
-    {
-        if (sampleCountTarget) {
-            // printf("block %d\n", sampleNum);
-
-            // sampleCounter += bufferToFill.numSamples;
-
-            // while (sampleCounter >= sampleCountTarget) {
-            //     trackEmitter.sendClockTick();
-            //     sampleCounter -= sampleCountTarget;
-            // }
-
-            int numSamples = bufferToFill.numSamples;
-
-            for (int sample = 0; sample < numSamples; ++sample) {
-                sampleCounter++;
-                sampleNum++;
-
-                if (sampleCounter >= sampleCountTarget) // Time to send a tick?
-                {
-                    // printf("tick %d\n", sampleNum);
-                    // trackEmitter.sendClockTick(sampleNum);
-                    trackEmitter.sendClockTick(sample);
-                    sampleCounter = 0; // Reset counter
-                }
-            }
-        }
-
-        bufferToFill.clearActiveBufferRegion();
     }
 
 private:
