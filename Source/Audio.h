@@ -21,9 +21,6 @@ private:
 
         deviceManager.addAudioCallback(&audioSourcePlayer);
         audioSourcePlayer.setSource(this);
-
-        // TO be removed once everything is setup
-        addTrack();
     }
 
 public:

@@ -43,4 +43,30 @@ public:
             outputStream.writeText(root.dump(4), false, false, nullptr);
         }
     }
+
+    void load(juce::String filePath, AudioTrack& track, TrackComponent& trackComponent)
+    {
+        juce::File file = juce::File(filePath);
+        if (file.exists()) {
+            std::string jsonStr = file.loadFileAsString().toStdString();
+
+            json root = json::parse(jsonStr);
+            trackComponent.name = root["name"].get<std::string>();
+            trackComponent.color = juce::Colour::fromString(root["color"].get<std::string>());
+
+            if (root["steps"].is_array()) {
+                track.steps.clear();
+                for (const auto& step : root["steps"]) {
+                    Step newStep;
+                    newStep.startStep = step["startStep"].get<int>();
+                    newStep.pitch = step["pitch"].get<int>();
+                    newStep.length = step["length"].get<int>();
+                    newStep.velocity = step["velocity"].get<float>();
+                    newStep.condition = step["condition"].get<int>();
+                    newStep.motion = step["motion"].get<int>();
+                    track.steps.add(newStep);
+                }
+            }
+        }
+    }
 };

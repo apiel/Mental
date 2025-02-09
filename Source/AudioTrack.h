@@ -48,7 +48,7 @@ private:
                     if (step.counter == 0) {
                         // note off
                         noteOff(step.pitch, sampleNum);
-                        printf("noteoff Step %i: %i\n", step.startStep, step.pitch);
+                        // printf("noteoff Step %i: %i\n", step.startStep, step.pitch);
                     }
                 }
                 // here might want to check for state == Status::ON
@@ -56,7 +56,9 @@ private:
                     step.counter = step.length;
                     // note on
                     noteOn(step.pitch, step.velocity, sampleNum);
-                    printf("noteon Step %i: %i\n", step.startStep, step.pitch);
+                    printf("[%i/%i] noteon Step: %s (%i), %i%%\n", step.startStep + 1, MAX_STEPS,
+                        juce::MidiMessage::getMidiNoteName(step.pitch, true, true, 4).toStdString().c_str(),
+                        step.pitch, (int)(step.velocity * 100.0f));
                 }
             }
         }
@@ -85,14 +87,14 @@ public:
         // steps.add({ 56, 83, 6 }); // B5 spanning 6 steps
 
         // Another simple pattern
-        steps.add({ 0, 48, 1 });
-        steps.add({ 8, 48, 1 });
-        steps.add({ 16, 48, 1 });
-        steps.add({ 24, 48, 1 });
-        steps.add({ 32, 48, 1 });
-        steps.add({ 40, 48, 1 });
-        steps.add({ 48, 48, 1 });
-        steps.add({ 56, 48, 1 });
+        // steps.add({ 0, 48, 1 });
+        // steps.add({ 8, 48, 1 });
+        // steps.add({ 16, 48, 1 });
+        // steps.add({ 24, 48, 1 });
+        // steps.add({ 32, 48, 1 });
+        // steps.add({ 40, 48, 1 });
+        // steps.add({ 48, 48, 1 });
+        // steps.add({ 56, 48, 1 });
     }
 
     ~AudioTrack()
