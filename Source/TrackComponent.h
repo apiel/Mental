@@ -33,9 +33,10 @@ protected:
     TrackTabLookAndFeel tabLookAndFeel;
 
     TrackPluginComponent audioComponent;
-    TrackSeqComponent seqComponent;
 
 public:
+    TrackSeqComponent seqComponent;
+
     juce::Colour color;
     int tabId;
     juce::String name;

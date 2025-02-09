@@ -26,6 +26,12 @@ protected:
         return (120 - 24) - verticalScrollbar.getCurrentRangeStart();
     }
 
+    void setMidiRangeStart(int middlePitch)
+    {
+        printf("middlePitch: %i (%s)\n", middlePitch, juce::MidiMessage::getMidiNoteName(middlePitch, true, true, 4).toStdString().c_str());
+        verticalScrollbar.setCurrentRangeStart(120 - middlePitch);
+    }
+
     std::unique_ptr<NoteToolboxComponent> toolbox = nullptr;
     void showToolbox()
     {
@@ -82,7 +88,6 @@ public:
         verticalScrollbar.setCurrentRangeStart(((120 - 12) / 2) + 12 - numNotes / 2);
         setColor(color);
 
-        // FIXME doesnt work, seems like steps are still empty when mounting...
         initScrollPosition();
 
         verticalScrollbar.addListener(this);
@@ -109,12 +114,8 @@ public:
             }
 
             // Calculate the center of the active step range
-            int midiRange = maxPitch - minPitch;
             int midiCenter = (minPitch + maxPitch) / 2;
-
-            // Make sure we keep it within valid scroll limits
-            int scrollStart = juce::jlimit(12, 120 - numNotes, midiCenter - numNotes / 2 - midiRange / 2);
-            verticalScrollbar.setCurrentRangeStart(scrollStart);
+            setMidiRangeStart(midiCenter);
         }
     }
 

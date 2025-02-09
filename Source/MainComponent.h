@@ -30,6 +30,7 @@ public:
             AudioTrack& track = Audio::get().addTrack();
             TrackComponent& trackComponent = container.addTrack(track, "Track " + juce::String(i + 1), juce::Colours::orange);
             serializer.load("track" + juce::String(i + 1) + ".json", Audio::get().getTrack(i), container.getTrack(i));
+            trackComponent.seqComponent.initScrollPosition();
             container.updateTab(trackComponent);
             sidebar.addButton(trackComponent.tabId);
         }
