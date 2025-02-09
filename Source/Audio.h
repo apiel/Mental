@@ -63,7 +63,6 @@ public:
     void releaseResources() override
     {
         audioTempo.releaseResources();
-        // track1.releaseResources();
         for (int i = 0; i < TRACK_COUNT; i++) {
             tracks[i].releaseResources();
         }
