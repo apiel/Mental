@@ -10,6 +10,7 @@ class Audio : public juce::AudioSource {
 private:
     juce::AudioDeviceManager deviceManager;
     juce::AudioSourcePlayer audioSourcePlayer;
+    juce::MixerAudioSource mixer;
 
     AudioTempo& audioTempo = AudioTempo::get();
     std::vector<std::unique_ptr<AudioTrack>> tracks;
@@ -40,16 +41,18 @@ public:
     AudioTrack& addTrack()
     {
         tracks.push_back(std::make_unique<AudioTrack>());
-        AudioTrack& track = *tracks.back(); // Return reference to new track
+        auto& track = tracks.back(); // Return reference to new track
+
+        mixer.addInputSource(track.get(), false);
 
         if (auto* device = deviceManager.getCurrentAudioDevice()) {
             double currentSampleRate = device->getCurrentSampleRate();
             int currentBlockSize = device->getCurrentBufferSizeSamples();
             if (currentSampleRate > 0.0 && currentBlockSize > 0) {
-                track.prepareToPlay(currentBlockSize, currentSampleRate);
+                track->prepareToPlay(currentBlockSize, currentSampleRate);
             }
         }
-        return track;
+        return *track;
     }
 
     AudioTrack& getTrack(int index)
@@ -75,26 +78,28 @@ public:
         //     track->getNextAudioBlock(bufferToFill);
         // }
 
-        // Temporary buffer for mixing
-        juce::AudioBuffer<float> mixBuffer;
-        mixBuffer.setSize(bufferToFill.buffer->getNumChannels(), bufferToFill.numSamples);
-        mixBuffer.clear();
+        // // Temporary buffer for mixing
+        // juce::AudioBuffer<float> mixBuffer;
+        // mixBuffer.setSize(bufferToFill.buffer->getNumChannels(), bufferToFill.numSamples);
+        // mixBuffer.clear();
 
-        // Mix all tracks into mixBuffer
-        for (auto& track : tracks) {
-            juce::AudioSourceChannelInfo tempBuffer(bufferToFill);
-            track->getNextAudioBlock(tempBuffer);
+        // // Mix all tracks into mixBuffer
+        // for (auto& track : tracks) {
+        //     juce::AudioSourceChannelInfo tempBuffer(bufferToFill);
+        //     track->getNextAudioBlock(tempBuffer);
 
-            // Sum each track into the mixBuffer
-            for (int channel = 0; channel < mixBuffer.getNumChannels(); ++channel) {
-                mixBuffer.addFrom(channel, 0, *tempBuffer.buffer, channel, tempBuffer.startSample, tempBuffer.numSamples);
-            }
-        }
+        //     // Sum each track into the mixBuffer
+        //     for (int channel = 0; channel < mixBuffer.getNumChannels(); ++channel) {
+        //         mixBuffer.addFrom(channel, 0, *tempBuffer.buffer, channel, tempBuffer.startSample, tempBuffer.numSamples);
+        //     }
+        // }
 
-        // Copy mixed audio back into bufferToFill
-        for (int channel = 0; channel < bufferToFill.buffer->getNumChannels(); ++channel) {
-            bufferToFill.buffer->copyFrom(channel, bufferToFill.startSample, mixBuffer, channel, 0, bufferToFill.numSamples);
-        }
+        // // Copy mixed audio back into bufferToFill
+        // for (int channel = 0; channel < bufferToFill.buffer->getNumChannels(); ++channel) {
+        //     bufferToFill.buffer->copyFrom(channel, bufferToFill.startSample, mixBuffer, channel, 0, bufferToFill.numSamples);
+        // }
+
+        mixer.getNextAudioBlock(bufferToFill);
     }
 
     void releaseResources() override
