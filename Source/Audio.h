@@ -14,9 +14,6 @@ private:
     AudioTempo& audioTempo = AudioTempo::get();
     std::vector<std::unique_ptr<AudioTrack>> tracks;
 
-        double sampleRate = 0.0;
-    int samplesPerBlockExpected = 0;
-
     Audio()
     {
         juce::String audioError = deviceManager.initialise(0, 2, nullptr, true, "Mental");
@@ -47,7 +44,14 @@ public:
     {
         tracks.push_back(std::make_unique<AudioTrack>());
         AudioTrack& track = *tracks.back(); // Return reference to new track
-        track.prepareToPlay(samplesPerBlockExpected, sampleRate);
+
+        if (auto* device = deviceManager.getCurrentAudioDevice()) {
+            double currentSampleRate = device->getCurrentSampleRate();
+            int currentBlockSize = device->getCurrentBufferSizeSamples();
+            if (currentSampleRate > 0.0 && currentBlockSize > 0) {
+                track.prepareToPlay(currentBlockSize, currentSampleRate);
+            }
+        }
         return track;
     }
 
@@ -59,12 +63,10 @@ public:
 
     void prepareToPlay(int samplesPerBlockExpected, double sampleRate) override
     {
-        this->samplesPerBlockExpected = samplesPerBlockExpected;
-        this->sampleRate = sampleRate;
         audioTempo.prepareToPlay(samplesPerBlockExpected, sampleRate);
-        for (auto& track : tracks) {
-            track->prepareToPlay(samplesPerBlockExpected, sampleRate);
-        }
+        // for (auto& track : tracks) {
+        //     track->prepareToPlay(samplesPerBlockExpected, sampleRate);
+        // }
     }
 
     void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) override
