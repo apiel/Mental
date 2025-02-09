@@ -70,10 +70,10 @@ public:
     void setColor(juce::Colour color)
     {
         this->color = color;
-        seqComponent.color = color;
-        // for (int i = 0; i < getNumTabs(); i++) {
-        //     setTabBackgroundColour(i, color);
-        // }
+        seqComponent.setColor(color);
+        for (int i = 0; i < getNumTabs(); i++) {
+            setTabBackgroundColour(i, color);
+        }
     }
 
     // void resized() override

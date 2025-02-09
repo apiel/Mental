@@ -2,9 +2,9 @@
 
 #include <JuceHeader.h>
 
+#include "AudioTrack.h"
 #include "NoteToolboxComponent.h"
 #include "Step.h"
-#include "AudioTrack.h"
 #include "constants.h"
 
 class TrackSeqComponent : public juce::Component, public juce::ScrollBar::Listener {
@@ -80,12 +80,18 @@ public:
         verticalScrollbar.setRangeLimits(12, 120); // C0 to C9 range
         verticalScrollbar.setCurrentRange(12, 12 + numNotes);
         verticalScrollbar.setCurrentRangeStart(((120 - 12) / 2) + 12 - numNotes / 2);
-        verticalScrollbar.setColour(juce::ScrollBar::thumbColourId, color);
+        setColor(color);
 
         // FIXME doesnt work, seems like steps are still empty when mounting...
         initScrollPosition();
 
         verticalScrollbar.addListener(this);
+    }
+
+    void setColor(juce::Colour color)
+    {
+        this->color = color;
+        verticalScrollbar.setColour(juce::ScrollBar::thumbColourId, color);
     }
 
     void initScrollPosition()
