@@ -1,6 +1,7 @@
 #pragma once
 
 #include "AudioTempo.h"
+#include "AudioTrack.h"
 #include <JuceHeader.h>
 
 class Audio : public juce::AudioSource {
@@ -9,6 +10,7 @@ private:
     juce::AudioSourcePlayer audioSourcePlayer;
 
     AudioTempo& audioTempo = AudioTempo::get();
+    AudioTrack track1;
 
     Audio()
     {
@@ -36,6 +38,7 @@ public:
     void prepareToPlay(int samplesPerBlockExpected, double sampleRate) override
     {
         audioTempo.prepareToPlay(samplesPerBlockExpected, sampleRate);
+        track1.prepareToPlay(samplesPerBlockExpected, sampleRate);
     }
 
     void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) override
@@ -43,10 +46,15 @@ public:
         // printf("yoyoyoyo block\n");
         bufferToFill.clearActiveBufferRegion();
         audioTempo.getNextAudioBlock(bufferToFill);
+        track1.getNextAudioBlock(bufferToFill);
     }
 
     void releaseResources() override
     {
         audioTempo.releaseResources();
+        track1.releaseResources();
     }
+
+private:
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Audio)
 };
