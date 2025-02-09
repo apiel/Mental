@@ -3,7 +3,7 @@
 #include <JuceHeader.h>
 
 #include "Step.h"
-#include "TrackAudioComponent.h"
+#include "TrackPluginComponent.h"
 #include "TrackSeqComponent.h"
 #include "constants.h"
 
@@ -31,7 +31,7 @@ class TrackComponent : public juce::TabbedComponent {
 protected:
     TrackTabLookAndFeel tabLookAndFeel;
 
-    TrackAudioComponent audioComponent;
+    TrackPluginComponent audioComponent;
     TrackSeqComponent seqComponent;
 
     juce::Array<Step> steps;

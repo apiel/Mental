@@ -5,20 +5,19 @@
 #include "AudioTrack.h"
 #include <JuceHeader.h>
 
-// Rename to plugin component or SynthComponent
-class TrackAudioComponent : public juce::Component {
+class TrackPluginComponent : public juce::Component {
 private:
     AudioTrack& audioTrack;
     std::unique_ptr<juce::AudioProcessorEditor> pluginEditor;
 
 public:
-    TrackAudioComponent(int trackId)
+    TrackPluginComponent(int trackId)
         : audioTrack(Audio::get().getTrack(trackId))
     {
         setWantsKeyboardFocus(true);
     }
 
-    ~TrackAudioComponent() override
+    ~TrackPluginComponent() override
     {
         deleteAllChildren();
     }
@@ -80,5 +79,5 @@ public:
     }
 
 private:
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TrackAudioComponent)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TrackPluginComponent)
 };

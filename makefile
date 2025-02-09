@@ -1,4 +1,5 @@
 all:
+	rm -f Builds/LinuxMakefile/build/intermediate/Debug/Main_*
 	make -C Builds/LinuxMakefile
 	./Builds/LinuxMakefile/build/Mental
 
