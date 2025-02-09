@@ -1,5 +1,8 @@
 # Mental
 
+<img src='https://github.com/apiel/Mental/blob/main/screenshot1.png?raw=true' width='480'>
+<img src='https://github.com/apiel/Mental/blob/main/screenshot2.png?raw=true' width='480'>
+
 ## Install
 
 Clone project:
@@ -15,3 +18,4 @@ To make some modification to Juce project, build the projucer:
 cd libs/JUCE/extras/Projucer/Builds/LinuxMakefile
 make
 ```
+

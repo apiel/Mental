@@ -73,7 +73,29 @@ public:
     {
         bufferToFill.clearActiveBufferRegion();
         audioTempo.getNextAudioBlock(bufferToFill);
-        mixer.getNextAudioBlock(bufferToFill);
+
+        // Temporary buffer for mixing
+        juce::AudioBuffer<float> mixBuffer;
+        mixBuffer.setSize(bufferToFill.buffer->getNumChannels(), bufferToFill.numSamples);
+        mixBuffer.clear();
+
+        // Mix all tracks into mixBuffer
+        for (auto& track : tracks) {
+            juce::AudioSourceChannelInfo tempBuffer(bufferToFill);
+            track->getNextAudioBlock(tempBuffer);
+
+            // Sum each track into the mixBuffer
+            for (int channel = 0; channel < mixBuffer.getNumChannels(); ++channel) {
+                mixBuffer.addFrom(channel, 0, *tempBuffer.buffer, channel, tempBuffer.startSample, tempBuffer.numSamples);
+            }
+        }
+
+        // Copy mixed audio back into bufferToFill
+        for (int channel = 0; channel < bufferToFill.buffer->getNumChannels(); ++channel) {
+            bufferToFill.buffer->copyFrom(channel, bufferToFill.startSample, mixBuffer, channel, 0, bufferToFill.numSamples);
+        }
+
+        // mixer.getNextAudioBlock(bufferToFill);
     }
 
     void releaseResources() override
