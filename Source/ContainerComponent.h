@@ -30,11 +30,9 @@ public:
     TrackComponent& addTrack(AudioTrack& audioTrack, juce::String name, juce::Colour color)
     {
         int trackIndex = trackComponents.size(); // Get next track index
-        trackComponents.push_back(std::make_unique<TrackComponent>(color, audioTrack));
+        trackComponents.push_back(std::make_unique<TrackComponent>(color, audioTrack, trackIndex + 1, name));
 
         TrackComponent& newTrack = *trackComponents.back();
-        newTrack.tabId = trackIndex + 1;
-
         addTab(name, color, &newTrack, false);
 
         return newTrack;

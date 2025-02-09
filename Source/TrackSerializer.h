@@ -33,9 +33,13 @@ public:
 
         json root;
         root["steps"] = stepArray;
+        root["color"] = ("#" + trackComponent.color.toDisplayString(false)).toStdString();
+        root["name"] = trackComponent.name.toStdString();
 
         juce::FileOutputStream outputStream(file);
         if (outputStream.openedOk()) {
+            outputStream.setPosition(0); // Ensure writing starts from the beginning
+            outputStream.truncate(); // Truncate the file to remove old contents
             outputStream.writeText(root.dump(4), false, false, nullptr);
         }
     }

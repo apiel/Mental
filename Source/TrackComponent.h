@@ -37,9 +37,14 @@ protected:
 
 public:
     juce::Colour color;
-    TrackComponent(juce::Colour color, AudioTrack& audioTrack)
+    int tabId;
+    juce::String name;
+
+    TrackComponent(juce::Colour color, AudioTrack& audioTrack, int tabId, juce::String name)
         : juce::TabbedComponent(juce::TabbedButtonBar::TabsAtTop)
         , color(color)
+        , tabId(tabId)
+        , name(name)
         , audioComponent(audioTrack)
         , seqComponent(audioTrack, color)
     {
@@ -72,7 +77,6 @@ public:
         TabbedComponent::resized();
     }
 
-    int tabId = -1;
     void parentTabChanged(int newTabIndex, const juce::String& newTabName)
     {
         if (tabId == newTabIndex) {

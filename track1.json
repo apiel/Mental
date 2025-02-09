@@ -1,0 +1,70 @@
+{
+    "color": "#FFA500",
+    "name": "Track 1",
+    "steps": [
+        {
+            "condition": 0,
+            "length": 1,
+            "motion": 0,
+            "pitch": 48,
+            "startStep": 0,
+            "velocity": 1.0
+        },
+        {
+            "condition": 0,
+            "length": 1,
+            "motion": 0,
+            "pitch": 48,
+            "startStep": 8,
+            "velocity": 1.0
+        },
+        {
+            "condition": 0,
+            "length": 1,
+            "motion": 0,
+            "pitch": 48,
+            "startStep": 16,
+            "velocity": 1.0
+        },
+        {
+            "condition": 0,
+            "length": 1,
+            "motion": 0,
+            "pitch": 48,
+            "startStep": 24,
+            "velocity": 1.0
+        },
+        {
+            "condition": 0,
+            "length": 1,
+            "motion": 0,
+            "pitch": 48,
+            "startStep": 32,
+            "velocity": 1.0
+        },
+        {
+            "condition": 0,
+            "length": 1,
+            "motion": 0,
+            "pitch": 48,
+            "startStep": 40,
+            "velocity": 1.0
+        },
+        {
+            "condition": 0,
+            "length": 1,
+            "motion": 0,
+            "pitch": 48,
+            "startStep": 48,
+            "velocity": 1.0
+        },
+        {
+            "condition": 0,
+            "length": 1,
+            "motion": 0,
+            "pitch": 48,
+            "startStep": 56,
+            "velocity": 1.0
+        }
+    ]
+}
