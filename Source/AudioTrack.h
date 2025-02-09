@@ -70,31 +70,7 @@ public:
 
     AudioTrack()
     {
-        // Instead of void onMidiClockTick(int clockCounter, bool isQuarterNote, int sampleNum) override
-        // should use callback function
         TrackEmitter::get().subscribe(this);
-
-        // Example MIDI Notes (Step, Pitch, Length)
-        // steps.add({ 0, 60, 4 }); // C4 spanning 4 steps
-        // steps.add({ 4, 62, 2 }); // D4 spanning 2 steps
-        // steps.add({ 8, 64, 8 }); // E4 spanning 8 steps
-        // steps.add({ 16, 67, 4 }); // G4 spanning 4 steps
-        // steps.add({ 20, 69, 6 }); // A4 spanning 6 steps
-        // steps.add({ 24, 72, 6 }); // C5 spanning 6 steps
-        // steps.add({ 32, 75, 6 }); // D#5 spanning 6 steps
-        // steps.add({ 40, 77, 6 }); // F5 spanning 6 steps
-        // steps.add({ 48, 80, 6 }); // G#5 spanning 6 steps
-        // steps.add({ 56, 83, 6 }); // B5 spanning 6 steps
-
-        // Another simple pattern
-        // steps.add({ 0, 48, 1 });
-        // steps.add({ 8, 48, 1 });
-        // steps.add({ 16, 48, 1 });
-        // steps.add({ 24, 48, 1 });
-        // steps.add({ 32, 48, 1 });
-        // steps.add({ 40, 48, 1 });
-        // steps.add({ 48, 48, 1 });
-        // steps.add({ 56, 48, 1 });
     }
 
     ~AudioTrack()
@@ -169,6 +145,43 @@ public:
             }
         } else {
             std::cout << "no plugins found\n";
+        }
+    }
+
+    juce::String getPresetData()
+    {
+        if (plugin) {
+            juce::MemoryBlock state;
+            plugin->getStateInformation(state);
+            return state.toBase64Encoding();
+        }
+        return "";
+    }
+
+    void loadPresetData(juce::String& data)
+    {
+        if (plugin) {
+            // plugin->setStateInformation(data.toRawUTF8(), data.length());
+            juce::MemoryBlock state;
+            state.fromBase64Encoding(data);
+            plugin->setStateInformation(state.getData(), (int)state.getSize());
+        }
+    }
+
+    void listPresetParameters()
+    {
+        if (plugin) {
+            auto& params = plugin->getParameters();
+
+            std::cout << "Vital Plugin Parameters:\n";
+            for (int i = 0; i < params.size(); ++i) {
+                juce::AudioProcessorParameter* param = params[i];
+                std::cout << i << "[" << param->getLabel().toStdString() << "]"
+                          << param->getName(100).toStdString()
+                          << " = " << param->getValue() << "\n";
+            }
+        } else {
+            std::cout << "Plugin not loaded.\n";
         }
     }
 

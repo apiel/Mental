@@ -35,13 +35,11 @@ public:
         root["steps"] = stepArray;
         root["color"] = ("#" + trackComponent.color.toDisplayString(false)).toStdString();
         root["name"] = trackComponent.name.toStdString();
+        root["pluginPreset"] = track.getPresetData().toStdString();
 
-        juce::FileOutputStream outputStream(file);
-        if (outputStream.openedOk()) {
-            outputStream.setPosition(0); // Ensure writing starts from the beginning
-            outputStream.truncate(); // Truncate the file to remove old contents
-            outputStream.writeText(root.dump(4), false, false, nullptr);
-        }
+        file.replaceWithText(root.dump(4));
+
+        // track.listPresetParameters();
     }
 
     void load(juce::String filePath, AudioTrack& track, TrackComponent& trackComponent)
@@ -60,6 +58,9 @@ public:
                 trackComponent.setColor(juce::Colour(r, g, b));
             }
 
+            std::string preset = root["pluginPreset"].get<std::string>();
+            juce::String presetString = preset;
+            track.loadPresetData(presetString);
             if (root["steps"].is_array()) {
                 track.steps.clear();
                 for (const auto& step : root["steps"]) {
