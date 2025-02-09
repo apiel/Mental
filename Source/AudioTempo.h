@@ -13,6 +13,16 @@ private:
 
     TrackEmitter& trackEmitter = TrackEmitter::get();
 
+    int clockCounter = 0;
+    void clockTick(int sampleNum)
+    {
+        clockCounter++;
+        // Clock events are sent at a rate of 24 pulses per quarter note
+        // (24/4 = 6)
+        bool isQuarterNote = clockCounter % 6 == 0;
+        trackEmitter.sendClockTick(clockCounter, isQuarterNote, sampleNum);
+    }
+
     AudioTempo()
     {
     }
@@ -47,12 +57,10 @@ public:
     void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) override
     {
         if (sampleCountTarget) {
-            // printf("block %d\n", sampleNum);
-
             // sampleCounter += bufferToFill.numSamples;
 
             // while (sampleCounter >= sampleCountTarget) {
-            //     trackEmitter.sendClockTick();
+            //     clockTick();
             //     sampleCounter -= sampleCountTarget;
             // }
 
@@ -63,10 +71,8 @@ public:
 
                 if (sampleCounter >= sampleCountTarget) // Time to send a tick?
                 {
-                    // printf("tick %d\n", sampleNum);
-                    // trackEmitter.sendClockTick(sampleNum);
-                    trackEmitter.sendClockTick(sample);
-                    sampleCounter = 0; // Reset counter
+                    clockTick(sample);
+                    sampleCounter = 0;
                 }
             }
         }
