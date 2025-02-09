@@ -40,6 +40,12 @@ public:
         return newTrack;
     }
 
+    TrackComponent& getTrack(int index)
+    {
+        jassert(index >= 0 && index < trackComponents.size());
+        return *trackComponents[index];
+    }
+
     void resized() override
     {
         masterComponent.setBounds(getLocalBounds());

@@ -9,12 +9,14 @@
 #include "Audio.h"
 #include "ContainerComponent.h"
 #include "SidebarComponent.h"
+#include "TrackSerializer.h"
 #include "constants.h"
 
 class MainComponent : public juce::Component {
 protected:
     ContainerComponent container;
     SidebarComponent sidebar;
+    TrackSerializer serializer;
 
 public:
     MainComponent()
@@ -31,6 +33,13 @@ public:
             sidebar.addButton(trackComponent.tabId);
         }
         sidebar.resized();
+    }
+
+    ~MainComponent()
+    {
+        for (int i = 0; i < TRACK_COUNT; i++) {
+            serializer.save("track" + juce::String(i + 1) + ".json", Audio::get().getTrack(i), container.getTrack(i));
+        }
     }
 
     void resized() override
