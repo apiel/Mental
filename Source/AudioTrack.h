@@ -3,7 +3,7 @@
 // VsCode doesn't seems to recognize JUCE_PLUGINHOST_VST3, so I just define it myself.
 #define JUCE_PLUGINHOST_VST3 1
 // #define JUCE_PLUGINHOST_VST 1
-#define JUCE_PLUGINHOST_LV2 1
+// #define JUCE_PLUGINHOST_LV2 1
 
 #include "Step.h"
 #include "TrackListener.h"
@@ -17,7 +17,6 @@ private:
     int samplesPerBlockExpected = 0;
 
     juce::AudioPluginFormatManager pluginmanager;
-    std::unique_ptr<juce::AudioPluginInstance> plugin_instance;
 
     juce::Array<Step> steps;
 
@@ -44,7 +43,7 @@ private:
             //     status.set(Status::ON);
             // }
         }
-        if (plugin_instance) {
+        if (plugin) {
             for (auto& step : steps) {
                 if (step.counter) {
                     step.counter--;
@@ -66,6 +65,8 @@ private:
     }
 
 public:
+    std::unique_ptr<juce::AudioPluginInstance> plugin;
+
     AudioTrack()
     {
         // Instead of void onMidiClockTick(int clockCounter, bool isQuarterNote, int sampleNum) override
@@ -124,8 +125,8 @@ public:
 
     void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) override
     {
-        if (plugin_instance) {
-            plugin_instance->processBlock(*bufferToFill.buffer, midiBuffer);
+        if (plugin) {
+            plugin->processBlock(*bufferToFill.buffer, midiBuffer);
             midiBuffer.clear();
         } else {
             bufferToFill.clearActiveBufferRegion();
@@ -134,8 +135,8 @@ public:
 
     void releaseResources() override
     {
-        if (plugin_instance) {
-            plugin_instance->releaseResources();
+        if (plugin) {
+            plugin->releaseResources();
         }
     }
 
@@ -151,12 +152,12 @@ public:
 
         if (descs.size() > 0) {
             juce::String error;
-            plugin_instance = pluginmanager.createPluginInstance(*descs[0], sampleRate, samplesPerBlockExpected, error);
-            if (!plugin_instance) {
+            plugin = pluginmanager.createPluginInstance(*descs[0], sampleRate, samplesPerBlockExpected, error);
+            if (!plugin) {
                 std::cout << error << "\n";
             } else {
                 std::cout << "created " << descs[0]->descriptiveName << "\n";
-                plugin_instance->prepareToPlay(sampleRate, samplesPerBlockExpected);
+                plugin->prepareToPlay(sampleRate, samplesPerBlockExpected);
             }
         } else {
             std::cout << "no plugins found\n";

@@ -1,14 +1,19 @@
 #pragma once
 
 #include "constants.h"
+#include "Audio.h"
+#include "AudioTrack.h"
 #include <JuceHeader.h>
 
 // Rename to plugin component or SynthComponent
 class TrackAudioComponent : public juce::Component {
 private:
+    AudioTrack& audioTrack;
+    std::unique_ptr<juce::AudioProcessorEditor> pluginEditor;
 
 public:
-    TrackAudioComponent()
+    TrackAudioComponent(int trackId)
+        : audioTrack(Audio::get().getTrack(trackId))
     {
         setWantsKeyboardFocus(true);
     }
@@ -26,11 +31,11 @@ public:
         if (spaceIsDown && !wasSpacePressed) // Space pressed for the first time
         {
             wasSpacePressed = true;
-            // noteOn(60, 1.0, 0);
+            audioTrack.noteOn(60, 1.0, 0);
         } else if (!spaceIsDown && wasSpacePressed) // Space released
         {
             wasSpacePressed = false;
-            // noteOff(60, 1);
+            audioTrack.noteOff(60, 1);
         }
         return true;
     }
@@ -59,8 +64,8 @@ public:
 
     void showPluginEditor()
     {
-        if (plugin_instance && plugin_instance->hasEditor() && !pluginEditor) {
-            pluginEditor.reset(plugin_instance->createEditor());
+        if (audioTrack.plugin && audioTrack.plugin->hasEditor() && !pluginEditor) {
+            pluginEditor.reset(audioTrack.plugin->createEditor());
             addAndMakeVisible(pluginEditor.get());
             pluginEditor->setBounds(getLocalBounds());
         }
@@ -73,9 +78,6 @@ public:
             pluginEditor.reset();
         }
     }
-
-    std::unique_ptr<juce::AudioPluginInstance> plugin_instance;
-    std::unique_ptr<juce::AudioProcessorEditor> pluginEditor;
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TrackAudioComponent)

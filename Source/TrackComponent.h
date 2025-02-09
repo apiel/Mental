@@ -38,10 +38,10 @@ protected:
 
 public:
     juce::Colour color;
-    TrackComponent(juce::Colour color)
+    TrackComponent(juce::Colour color, int trackId)
         : juce::TabbedComponent(juce::TabbedButtonBar::TabsAtTop)
         , color(color)
-        , audioComponent()
+        , audioComponent(trackId)
         , seqComponent(color, steps)
     {
         // Example MIDI Notes (Step, Pitch, Length)

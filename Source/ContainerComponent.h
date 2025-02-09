@@ -9,14 +9,15 @@
 class ContainerComponent : public juce::TabbedComponent {
 protected:
     MasterComponent masterComponent;
+    // TODO change this to array...
     TrackComponent trackComponent1;
     // TrackComponent trackComponent2;
 
 public:
     ContainerComponent()
         : juce::TabbedComponent(juce::TabbedButtonBar::TabsAtLeft)
-        , trackComponent1(juce::Colours::orange)
-        // , trackComponent2(juce::Colours::green)
+        , trackComponent1(juce::Colours::orange, 0)
+        // , trackComponent2(juce::Colours::green, 1)
     {
         // setColour(TabbedComponent::backgroundColourId, sidebarColour);
         // setColour(TabbedComponent::outlineColourId, sidebarColour);

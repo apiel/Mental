@@ -46,7 +46,6 @@ public:
 
     void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) override
     {
-        // printf("block %d bpm %f\n", sampleCountTarget, bpm);
         if (sampleCountTarget) {
             // printf("block %d\n", sampleNum);
 

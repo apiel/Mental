@@ -10,7 +10,7 @@ private:
     juce::AudioSourcePlayer audioSourcePlayer;
 
     AudioTempo& audioTempo = AudioTempo::get();
-    AudioTrack track1;
+    AudioTrack tracks[TRACK_COUNT];
 
     Audio()
     {
@@ -35,24 +35,38 @@ public:
         deviceManager.closeAudioDevice();
     }
 
+    AudioTrack& getTrack(int index)
+    {
+        jassert(index < TRACK_COUNT);
+        jassert(index >= 0);
+        return tracks[index];
+    }
+
     void prepareToPlay(int samplesPerBlockExpected, double sampleRate) override
     {
         audioTempo.prepareToPlay(samplesPerBlockExpected, sampleRate);
-        track1.prepareToPlay(samplesPerBlockExpected, sampleRate);
+        for (int i = 0; i < TRACK_COUNT; i++) {
+            tracks[i].prepareToPlay(samplesPerBlockExpected, sampleRate);
+        }
     }
 
     void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) override
     {
-        // printf("yoyoyoyo block\n");
         bufferToFill.clearActiveBufferRegion();
         audioTempo.getNextAudioBlock(bufferToFill);
-        track1.getNextAudioBlock(bufferToFill);
+        // TODO need to use a mixer
+        for (int i = 0; i < TRACK_COUNT; i++) {
+            tracks[i].getNextAudioBlock(bufferToFill);
+        }
     }
 
     void releaseResources() override
     {
         audioTempo.releaseResources();
-        track1.releaseResources();
+        // track1.releaseResources();
+        for (int i = 0; i < TRACK_COUNT; i++) {
+            tracks[i].releaseResources();
+        }
     }
 
 private:
