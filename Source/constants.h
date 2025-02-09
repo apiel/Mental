@@ -17,7 +17,7 @@ juce::Colour seqNoteColour = juce::Colours::white.darker(0.10);
 juce::Colour seqNoteLighterColour = juce::Colours::black.brighter(0.70);
 
 const int MAX_STEPS = 64;
-const int TRACK_COUNT = 4;
+const int TRACK_COUNT = 2;
 
 enum TrackStatus {
     MUTED = 0,
