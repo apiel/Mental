@@ -2,10 +2,10 @@
 
 #include <JuceHeader.h>
 
+#include "AudioTrack.h"
 #include "Step.h"
 #include "TrackPluginComponent.h"
 #include "TrackSeqComponent.h"
-#include "AudioTrack.h"
 #include "constants.h"
 
 class TrackTabLookAndFeel : public juce::LookAndFeel_V4 {
@@ -65,6 +65,15 @@ public:
     ~TrackComponent() override
     {
         setLookAndFeel(nullptr);
+    }
+
+    void setColor(juce::Colour color)
+    {
+        this->color = color;
+        seqComponent.color = color;
+        // for (int i = 0; i < getNumTabs(); i++) {
+        //     setTabBackgroundColour(i, color);
+        // }
     }
 
     // void resized() override

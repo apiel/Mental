@@ -1,6 +1,6 @@
 {
-    "color": "#FFA500",
-    "name": "Track 1",
+    "color": "#4FBFC5",
+    "name": "Demo",
     "steps": [
         {
             "condition": 0,
@@ -20,7 +20,7 @@
         },
         {
             "condition": 0,
-            "length": 1,
+            "length": 12,
             "motion": 0,
             "pitch": 48,
             "startStep": 16,

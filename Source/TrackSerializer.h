@@ -52,7 +52,13 @@ public:
 
             json root = json::parse(jsonStr);
             trackComponent.name = root["name"].get<std::string>();
-            trackComponent.color = juce::Colour::fromString(root["color"].get<std::string>());
+            std::string colorString = root["color"].get<std::string>(); // Read from JSON
+            if (colorString.length() == 7) { // Ensure it's in #RRGGBB format
+                int r = std::stoi(colorString.substr(1, 2), nullptr, 16);
+                int g = std::stoi(colorString.substr(3, 2), nullptr, 16);
+                int b = std::stoi(colorString.substr(5, 2), nullptr, 16);
+                trackComponent.setColor(juce::Colour(r, g, b));
+            }
 
             if (root["steps"].is_array()) {
                 track.steps.clear();
