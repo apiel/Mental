@@ -14,6 +14,9 @@ private:
     AudioTempo& audioTempo = AudioTempo::get();
     std::vector<std::unique_ptr<AudioTrack>> tracks;
 
+        double sampleRate = 0.0;
+    int samplesPerBlockExpected = 0;
+
     Audio()
     {
         juce::String audioError = deviceManager.initialise(0, 2, nullptr, true, "Mental");
@@ -43,7 +46,9 @@ public:
     AudioTrack& addTrack()
     {
         tracks.push_back(std::make_unique<AudioTrack>());
-        return *tracks.back(); // Return reference to new track
+        AudioTrack& track = *tracks.back(); // Return reference to new track
+        track.prepareToPlay(samplesPerBlockExpected, sampleRate);
+        return track;
     }
 
     AudioTrack& getTrack(int index)
@@ -54,6 +59,8 @@ public:
 
     void prepareToPlay(int samplesPerBlockExpected, double sampleRate) override
     {
+        this->samplesPerBlockExpected = samplesPerBlockExpected;
+        this->sampleRate = sampleRate;
         audioTempo.prepareToPlay(samplesPerBlockExpected, sampleRate);
         for (auto& track : tracks) {
             track->prepareToPlay(samplesPerBlockExpected, sampleRate);

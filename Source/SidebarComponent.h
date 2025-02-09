@@ -1,6 +1,8 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include <vector>
+
 #include "constants.h"
 
 class FlatButtonLookAndFeel : public juce::LookAndFeel_V4 {
@@ -29,7 +31,7 @@ public:
 
 class SidebarComponent : public juce::Component {
 protected:
-    juce::TextButton masterButton, track1Button, track2Button;
+    std::vector<std::unique_ptr<juce::TextButton>> buttons;
     ContainerComponent& container;
     FlatButtonLookAndFeel flatButtonLookAndFeel;
 
@@ -37,33 +39,33 @@ public:
     SidebarComponent(ContainerComponent& containerRef)
         : container(containerRef)
     {
-        addTabButton(masterButton, 0);
-        addTabButton(track1Button, 1);
-        addTabButton(track2Button, 2);
+        addButton(0);
     }
 
     ~SidebarComponent() override
     {
-        masterButton.setLookAndFeel(nullptr);
-        track1Button.setLookAndFeel(nullptr);
-        track2Button.setLookAndFeel(nullptr);
+        for (auto& button : buttons) {
+            button->setLookAndFeel(nullptr);
+        }
     }
 
-    void addTabButton(juce::TextButton& button, int index)
+    void addButton(int index)
     {
-        addAndMakeVisible(button);
-        button.setButtonText(container.getTabNames()[index]);
-        button.onClick = [this, index] { container.setCurrentTabIndex(index); };
-        button.setLookAndFeel(&flatButtonLookAndFeel);
-        button.setColour(juce::TextButton::textColourOffId, container.getTabBackgroundColour(index));
+        auto button = std::make_unique<juce::TextButton>();
+        addAndMakeVisible(*button);
+        button->setButtonText(container.getTabNames()[index]);
+        button->onClick = [this, index] { container.setCurrentTabIndex(index); };
+        button->setLookAndFeel(&flatButtonLookAndFeel);
+        button->setColour(juce::TextButton::textColourOffId, container.getTabBackgroundColour(index));
+        buttons.push_back(std::move(button));
     }
 
     void resized() override
     {
         int h = 60;
-        masterButton.setBounds(0, 0, getWidth(), h - 2);
-        track1Button.setBounds(0, h, getWidth(), h - 2);
-        track2Button.setBounds(0, h * 2, getWidth(), h - 2);
+        for (size_t i = 0; i < buttons.size(); i++) {
+            buttons[i]->setBounds(0, i * h, getWidth(), h - 2);
+        }
     }
 
     void paint(juce::Graphics& g) override

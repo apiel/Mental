@@ -1,6 +1,8 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include <memory> // Required for std::unique_ptr
+#include <vector>
 
 #include "Audio.h"
 #include "MasterComponent.h"
@@ -10,9 +12,7 @@
 class ContainerComponent : public juce::TabbedComponent {
 protected:
     MasterComponent masterComponent;
-    TrackComponent trackComponents[TRACK_COUNT] = {
-        TrackComponent(juce::Colours::orange, Audio::get().getTrack(0)),
-    };
+    std::vector<std::unique_ptr<TrackComponent>> trackComponents; // Store track components as unique_ptrs
 
 public:
     ContainerComponent()
@@ -23,27 +23,36 @@ public:
         addTab("Master", juce::Colours::grey, &masterComponent, false);
         masterComponent.tabId = 0;
 
-        for (int i = 0; i < TRACK_COUNT; i++) {
-            addTab("Track " + std::to_string(i + 1), juce::Colours::orange, &trackComponents[i], false);
-            trackComponents[i].tabId = i + 1;
-        }
-
         setCurrentTabIndex(0);
+    }
+
+    // Method to add a new track dynamically
+    TrackComponent& addTrack(AudioTrack& audioTrack, juce::String name, juce::Colour color)
+    {
+        int trackIndex = trackComponents.size(); // Get next track index
+        trackComponents.push_back(std::make_unique<TrackComponent>(color, audioTrack));
+
+        TrackComponent& newTrack = *trackComponents.back();
+        newTrack.tabId = trackIndex + 1;
+
+        addTab(name, color, &newTrack, false);
+
+        return newTrack;
     }
 
     void resized() override
     {
         masterComponent.setBounds(getLocalBounds());
-        for (int i = 0; i < TRACK_COUNT; i++) {
-            trackComponents[i].setBounds(getLocalBounds());
+        for (auto& trackComponent : trackComponents) {
+            trackComponent->setBounds(getLocalBounds());
         }
     }
 
     void currentTabChanged(int newTabIndex, const juce::String& newTabName) override
     {
         masterComponent.parentTabChanged(newTabIndex, newTabName);
-        for (int i = 0; i < TRACK_COUNT; i++) {
-            trackComponents[i].parentTabChanged(newTabIndex, newTabName);
+        for (auto& trackComponent : trackComponents) {
+            trackComponent->parentTabChanged(newTabIndex, newTabName);
         }
     }
 };

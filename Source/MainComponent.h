@@ -6,9 +6,10 @@
 
 #include <JuceHeader.h>
 
+#include "Audio.h"
 #include "ContainerComponent.h"
 #include "SidebarComponent.h"
-#include "Audio.h"
+#include "constants.h"
 
 class MainComponent : public juce::Component {
 protected:
@@ -19,10 +20,17 @@ public:
     MainComponent()
         : sidebar(container)
     {
-        Audio::get();
         setSize(1200, 800);
         addAndMakeVisible(sidebar);
         addAndMakeVisible(container);
+
+        // Initialize tracks (if needed)
+        for (int i = 0; i < TRACK_COUNT; i++) {
+            AudioTrack& track = Audio::get().addTrack();
+            TrackComponent& trackComponent = container.addTrack(track, "Track " + juce::String(i + 1), juce::Colours::orange);
+            sidebar.addButton(trackComponent.tabId);
+        }
+        sidebar.resized();
     }
 
     void resized() override
