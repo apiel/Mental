@@ -5,14 +5,14 @@
 #include "TrackListener.h"
 #include <JuceHeader.h>
 
-class TempoComponent : public juce::Component {
+class BpmComponent : public juce::Component {
 private:
     juce::Slider tempoKnob;
     KnobLookAndFeel customLookAndFeel;
     AudioTempo& audioTempo = AudioTempo::get();
 
 public:
-    TempoComponent()
+    BpmComponent()
         : customLookAndFeel({ juce::Colours::palevioletred, " BPM" })
     {
         tempoKnob.setLookAndFeel(&customLookAndFeel);
@@ -26,7 +26,7 @@ public:
         addAndMakeVisible(tempoKnob);
     }
 
-    ~TempoComponent() override
+    ~BpmComponent() override
     {
         tempoKnob.setLookAndFeel(nullptr);
     }
@@ -43,5 +43,5 @@ public:
     }
 
 private:
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TempoComponent)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BpmComponent)
 };

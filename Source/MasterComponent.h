@@ -1,24 +1,24 @@
 #pragma once
 
-#include "TempoComponent.h"
+#include "BpmComponent.h"
 #include <JuceHeader.h>
 
 class MasterComponent : public juce::Component {
 private:
-    TempoComponent tempoComponent;
+    BpmComponent bpmComponent;
 
 public:
     MasterComponent()
     {
-        addAndMakeVisible(tempoComponent);
+        addAndMakeVisible(bpmComponent);
     }
 
     void resized() override
     {
         auto area = getLocalBounds().reduced(10); // Add padding around the UI
-        auto tempoWidth = 150; // Set fixed width for the tempo component
-        auto tempoHeight = 150; // Set fixed height for the tempo component
-        tempoComponent.setBounds(area.removeFromTop(tempoHeight).removeFromLeft(tempoWidth));
+        auto bpmWidth = 150; // Set fixed width for the bpm component
+        auto bpmHeight = 150; // Set fixed height for the bpm component
+        bpmComponent.setBounds(area.removeFromTop(bpmHeight).removeFromLeft(bpmWidth));
     }
 
     void paint(juce::Graphics& g) override
