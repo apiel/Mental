@@ -12,6 +12,16 @@
 #include "TrackSerializer.h"
 #include "constants.h"
 
+juce::Colour defaultColours[] = {
+    juce::Colours::orange,
+    juce::Colours::mediumseagreen,
+    juce::Colours::darkred,
+    juce::Colours::darkslategrey,
+    juce::Colours::green,
+    juce::Colours::lightcoral,
+};
+const int defaultColoursCount = sizeof(defaultColours) / sizeof(juce::Colour);
+
 class MainComponent : public juce::Component {
 protected:
     ContainerComponent container;
@@ -28,7 +38,7 @@ public:
 
         for (int i = 0; i < TRACK_COUNT; i++) {
             AudioTrack& track = Audio::get().addTrack();
-            TrackComponent& trackComponent = container.addTrack(track, "Track " + juce::String(i + 1), juce::Colours::orange);
+            TrackComponent& trackComponent = container.addTrack(track, "Track " + juce::String(i + 1), defaultColours[i % defaultColoursCount]);
             serializer.load("track" + juce::String(i + 1) + ".json", Audio::get().getTrack(i), container.getTrack(i));
             trackComponent.seqComponent.initScrollPosition();
             container.updateTab(trackComponent);
