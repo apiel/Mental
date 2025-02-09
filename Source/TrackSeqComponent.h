@@ -81,6 +81,8 @@ public:
         verticalScrollbar.setCurrentRange(12, 12 + numNotes);
         verticalScrollbar.setCurrentRangeStart(((120 - 12) / 2) + 12 - numNotes / 2);
         verticalScrollbar.setColour(juce::ScrollBar::thumbColourId, color);
+
+        // FIXME doesnt work, seems like steps are still empty when mounting...
         initScrollPosition();
 
         verticalScrollbar.addListener(this);

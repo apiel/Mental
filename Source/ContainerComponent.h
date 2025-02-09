@@ -2,50 +2,48 @@
 
 #include <JuceHeader.h>
 
+#include "Audio.h"
 #include "MasterComponent.h"
 #include "TrackComponent.h"
-// #include "constants.h"
-#include "Audio.h"
+#include "constants.h"
 
 class ContainerComponent : public juce::TabbedComponent {
 protected:
     MasterComponent masterComponent;
-    // TODO change this to array...
-    TrackComponent trackComponent1;
-    // TrackComponent trackComponent2;
+    TrackComponent trackComponents[TRACK_COUNT] = {
+        TrackComponent(juce::Colours::orange, Audio::get().getTrack(0)),
+    };
 
 public:
     ContainerComponent()
         : juce::TabbedComponent(juce::TabbedButtonBar::TabsAtLeft)
-        , trackComponent1(juce::Colours::orange, Audio::get().getTrack(0))
-        // , trackComponent2(juce::Colours::green, Audio::get().getTrack(1))
     {
-        // setColour(TabbedComponent::backgroundColourId, sidebarColour);
-        // setColour(TabbedComponent::outlineColourId, sidebarColour);
         setOutline(0);
 
         addTab("Master", juce::Colours::grey, &masterComponent, false);
         masterComponent.tabId = 0;
-        addTab("Track 1", trackComponent1.color, &trackComponent1, false);
-        trackComponent1.tabId = 1;
-        // addTab("Track 2", trackComponent2.color, &trackComponent2, false);
-        // trackComponent2.tabId = 2;
 
-        setCurrentTabIndex(0); // Start with Track 1
+        for (int i = 0; i < TRACK_COUNT; i++) {
+            addTab("Track " + std::to_string(i + 1), juce::Colours::orange, &trackComponents[i], false);
+            trackComponents[i].tabId = i + 1;
+        }
+
+        setCurrentTabIndex(0);
     }
 
     void resized() override
     {
         masterComponent.setBounds(getLocalBounds());
-        trackComponent1.setBounds(getLocalBounds());
-        // trackComponent2.setBounds(getLocalBounds());
+        for (int i = 0; i < TRACK_COUNT; i++) {
+            trackComponents[i].setBounds(getLocalBounds());
+        }
     }
 
     void currentTabChanged(int newTabIndex, const juce::String& newTabName) override
     {
-        // printf("Tab changed to (%i) %s\n", newTabIndex, newTabName.toRawUTF8());
         masterComponent.parentTabChanged(newTabIndex, newTabName);
-        trackComponent1.parentTabChanged(newTabIndex, newTabName);
-        // trackComponent2.parentTabChanged(newTabIndex, newTabName);
+        for (int i = 0; i < TRACK_COUNT; i++) {
+            trackComponents[i].parentTabChanged(newTabIndex, newTabName);
+        }
     }
 };
